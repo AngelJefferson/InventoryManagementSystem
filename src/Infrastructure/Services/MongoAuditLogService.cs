@@ -18,17 +18,24 @@ public class MongoAuditLogService : IAuditLogService
 
     public async Task LogAsync(string action, string entityType, string entityId, string? performedBy = null, string? details = null, CancellationToken cancellationToken = default)
     {
-        var entry = new AuditLogEntry
+        try
         {
-            Action = action,
-            EntityType = entityType,
-            EntityId = entityId,
-            PerformedBy = performedBy,
-            Details = details,
-            Timestamp = DateTime.UtcNow
-        };
+            var entry = new AuditLogEntry
+            {
+                Action = action,
+                EntityType = entityType,
+                EntityId = entityId,
+                PerformedBy = performedBy,
+                Details = details,
+                Timestamp = DateTime.UtcNow
+            };
 
-        await _collection.InsertOneAsync(entry, cancellationToken: cancellationToken);
+            await _collection.InsertOneAsync(entry, cancellationToken: cancellationToken);
+        }
+        catch
+        {
+            // MongoDB not available — skip audit log
+        }
     }
 }
 
