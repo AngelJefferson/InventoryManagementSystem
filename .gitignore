@@ -8,3 +8,6 @@ dist/
 .secrets/
 appsettings.*.local.json
 frontend/.env
+api_output.txt
+api_error.txt
+*.log
