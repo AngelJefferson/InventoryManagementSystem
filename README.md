@@ -1,18 +1,36 @@
-# Inventory Management System — API REST
+# Inventory Management System
 
-Clean Architecture · ASP.NET Core Web API 9 · C# · SQL Server · MongoDB · JWT · Docker
+Clean Architecture · ASP.NET Core Web API 9 · React · PostgreSQL (Supabase) · MongoDB · JWT · Docker
+
+Sistema de gestión de inventario con operaciones CRUD para productos, categorías, proveedores, control de stock y autenticación de usuarios.
+
+## Stack
+
+| Tecnología | Uso |
+|-----------|-----|
+| **.NET 9** | API REST (ASP.NET Core, controllers) |
+| **Entity Framework Core 9** | ORM |
+| **PostgreSQL (Supabase)** | Base de datos principal |
+| **MongoDB** | Logs de auditoría |
+| **React 19 + Vite** | Frontend SPA |
+| **JWT** | Autenticación stateless |
+| **MediatR** | CQRS / Pipeline Behaviors |
+| **FluentValidation** | Validación de comandos |
+| **Swagger / Swashbuckle** | Documentación interactiva |
+| **xUnit + Moq** | Pruebas unitarias (22 tests) |
+| **Docker** | Contenedores |
 
 ## Arquitectura
 
 ```
 ┌──────────────────────────────────┐
-│            API (Controllers)     │  ← Capa de presentación
+│     API (Controllers, JWT)       │  ← Capa de presentación
 ├──────────────────────────────────┤
-│         Application (CQRS)       │  ← Casos de uso, DTOs, Validación
+│   Application (CQRS, Behaviors)  │  ← Casos de uso, DTOs, Validación
 ├──────────────────────────────────┤
-│         Infrastructure           │  ← EF Core, SQL Server, MongoDB
+│  Infrastructure (EF Core, Mongo) │  ← Persistencia, Servicios externos
 ├──────────────────────────────────┤
-│            Domain                │  ← Entidades, Value Objects, Interfaces
+│     Domain (Entities, Rules)     │  ← Reglas de negocio, Interfaces
 └──────────────────────────────────┘
 ```
 
@@ -20,14 +38,16 @@ Clean Architecture · ASP.NET Core Web API 9 · C# · SQL Server · MongoDB · J
 
 | Capa | Proyecto | Responsabilidad |
 |------|----------|----------------|
-| **Domain** | `InventoryManagement.Domain` | Entidades (`Product`, `Category`, `Supplier`, `Inventory`, `StockMovement`), Value Objects (`Money`), Excepciones, Interfaces de repositorio |
-| **Application** | `InventoryManagement.Application` | CQRS con MediatR (Commands/Queries/Handlers), FluentValidation, DTOs, AutoMapper, Pipeline Behaviors (Validation + AuditLog) |
+| **Domain** | `InventoryManagement.Domain` | Entidades (`Product`, `Category`, `Supplier`, `Inventory`, `StockMovement`, `User`), Value Objects (`Money`), Excepciones, Interfaces de repositorio |
+| **Application** | `InventoryManagement.Application` | CQRS con MediatR (Commands/Queries/Handlers), FluentValidation, DTOs, Behaviors (Validation + AuditLog), AuthService |
 | **Infrastructure** | `InventoryManagement.Infrastructure` | EF Core `ApplicationDbContext` con Fluent API, repositorios, `MongoAuditLogService` |
-| **API** | `InventoryManagement.API` | Controllers REST, JWT Auth, Swagger, Exception Handling Middleware |
+| **API** | `InventoryManagement.API` | Controllers REST, JWT, Swagger, Exception Handling Middleware, seed de usuarios |
 
 ## Diagrama ER
 
 ```
+Users ───────────────────────── (autenticación)
+
 Category (1) ──< (N) Product (N) >── (N) Supplier
                         │
                         │ (1)
@@ -35,93 +55,81 @@ Category (1) ──< (N) Product (N) >── (N) Supplier
                     Inventory (1)
                         │ (N)
                         │
-                  StockMovement
+                  StockMovement          MongoDB (audit logs)
 ```
-
-## Endpoints
-
-### Auth
-| Método | Ruta | Descripción | Auth |
-|--------|------|-------------|------|
-| `POST` | `/api/v1/auth/login` | Genera JWT | No |
-| `GET` | `/api/v1/auth/me` | Perfil del usuario autenticado | JWT |
-
-### Category
-| Método | Ruta | Descripción | Auth |
-|--------|------|-------------|------|
-| `GET` | `/api/v1/categories` | Listar todas | No |
-| `GET` | `/api/v1/categories/{id}` | Obtener por Id | No |
-| `POST` | `/api/v1/categories` | Crear | JWT (Admin) |
-| `PUT` | `/api/v1/categories/{id}` | Actualizar | JWT (Admin) |
-| `DELETE` | `/api/v1/categories/{id}` | Eliminar | JWT (Admin) |
-
-### Product
-| Método | Ruta | Descripción | Auth |
-|--------|------|-------------|------|
-| `GET` | `/api/v1/products` | Listar (filtro por categoría, búsqueda) | No |
-| `GET` | `/api/v1/products/{id}` | Obtener por Id | No |
-| `POST` | `/api/v1/products` | Crear | JWT (Admin) |
-| `PUT` | `/api/v1/products/{id}` | Actualizar | JWT (Admin) |
-| `DELETE` | `/api/v1/products/{id}` | Eliminar | JWT (Admin) |
-| `GET` | `/api/v1/products/{id}/stock` | Stock actual del producto | No |
-| `GET` | `/api/v1/products/low-stock?threshold=5` | Productos con bajo stock | JWT |
-
-### Supplier
-| Método | Ruta | Descripción | Auth |
-|--------|------|-------------|------|
-| `GET` | `/api/v1/suppliers` | Listar todos | No |
-| `GET` | `/api/v1/suppliers/{id}` | Obtener por Id | No |
-| `POST` | `/api/v1/suppliers` | Crear | JWT (Admin) |
-| `PUT` | `/api/v1/suppliers/{id}` | Actualizar | JWT (Admin) |
-| `DELETE` | `/api/v1/suppliers/{id}` | Eliminar | JWT (Admin) |
-
-### Inventory
-| Método | Ruta | Descripción | Auth |
-|--------|------|-------------|------|
-| `GET` | `/api/v1/inventory/{productId}` | Stock de un producto | No |
-| `POST` | `/api/v1/inventory/adjust` | Ajustar stock (entrada/salida) | JWT |
-| `GET` | `/api/v1/inventory/movements/{productId}` | Historial de movimientos | No |
-
-## Stack Tecnológico
-
-- **.NET 9** — ASP.NET Core Web API (controllers)
-- **Entity Framework Core 9** — ORM para SQL Server
-- **MongoDB 7** — Logs de auditoría
-- **JWT** — Autenticación stateless
-- **MediatR** — CQRS / Pipeline Behaviors
-- **FluentValidation** — Validación de comandos
-- **AutoMapper** — Mapeo DTO ↔ Entidad
-- **Swagger / Swashbuckle** — Documentación interactiva
-- **xUnit + Moq** — Pruebas unitarias
-- **Docker** — Contenedores (SQL Server, MongoDB, API)
 
 ## Requisitos
 
 - [.NET SDK 9.0](https://dotnet.microsoft.com/download/dotnet/9.0)
-- SQL Server (local o Docker)
+- Node.js 18+ (para frontend)
+- PostgreSQL (local o Supabase)
 - MongoDB (local o Docker)
-- Docker Desktop (opcional, para contenedores)
+- Docker Desktop (opcional)
 
-## Configuración Rápida (Local)
+## Configuración
 
 ### 1. Clonar y compilar
 
 ```bash
-git clone <repo-url>
+git clone https://github.com/AngelJefferson/InventoryManagementSystem.git
 cd InventoryManagementSystem
 dotnet build
 ```
 
-### 2. Base de datos
+### 2. Base de datos (PostgreSQL)
 
-El proyecto usa InMemory por defecto para desarrollo. Para usar SQL Server real, configure el connection string en `appsettings.Development.json`:
+Configura el connection string en `src/API/appsettings.json`:
 
 ```json
 {
   "ConnectionStrings": {
-    "DefaultConnection": "Server=localhost;Database=InventoryDb;User Id=sa;Password=Inventory_Admin_123!;TrustServerCertificate=True;"
+    "DefaultConnection": "Host=db.xxxx.supabase.co;Database=postgres;Username=postgres;Password=tu_password;SSL Mode=Require;Trust Server Certificate=true"
   }
 }
+```
+
+Si no hay connection string, el proyecto usa **InMemory** para desarrollo local.
+
+#### Tablas requeridas
+
+Ejecuta este SQL en tu base de datos:
+
+```sql
+CREATE TABLE "Categories" (
+    "Id" uuid PRIMARY KEY, "Name" varchar(100) NOT NULL, "Description" varchar(500) NOT NULL DEFAULT '',
+    "CreatedAt" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP, "UpdatedAt" timestamp
+);
+CREATE TABLE "Suppliers" (
+    "Id" uuid PRIMARY KEY, "Name" varchar(200) NOT NULL, "ContactName" varchar(200) NOT NULL,
+    "Email" varchar(200) NOT NULL, "Phone" varchar(50) NOT NULL DEFAULT '',
+    "CreatedAt" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP, "UpdatedAt" timestamp
+);
+CREATE TABLE "Products" (
+    "Id" uuid PRIMARY KEY, "Name" varchar(200) NOT NULL, "Description" varchar(2000) NOT NULL DEFAULT '',
+    "SKU" varchar(50) NOT NULL, "Price" numeric(18,2) NOT NULL, "Currency" varchar(3) NOT NULL,
+    "CategoryId" uuid NOT NULL REFERENCES "Categories"("Id") ON DELETE RESTRICT,
+    "SupplierId" uuid REFERENCES "Suppliers"("Id") ON DELETE SET NULL,
+    "IsActive" boolean NOT NULL DEFAULT true,
+    "CreatedAt" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP, "UpdatedAt" timestamp,
+    CONSTRAINT "AK_Products_SKU" UNIQUE ("SKU")
+);
+CREATE TABLE "Inventories" (
+    "Id" uuid PRIMARY KEY, "ProductId" uuid NOT NULL UNIQUE REFERENCES "Products"("Id") ON DELETE CASCADE,
+    "QuantityOnHand" integer NOT NULL, "MinimumStock" integer NOT NULL DEFAULT 0,
+    "Location" varchar(200) NOT NULL DEFAULT 'Main Warehouse', "LastUpdated" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+CREATE TABLE "StockMovements" (
+    "Id" uuid PRIMARY KEY, "ProductId" uuid NOT NULL REFERENCES "Products"("Id") ON DELETE NO ACTION,
+    "Type" varchar(10) NOT NULL, "Quantity" integer NOT NULL, "Reference" varchar(200) NOT NULL DEFAULT '',
+    "CreatedAt" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+CREATE TABLE "Users" (
+    "Id" uuid PRIMARY KEY, "Username" varchar(50) NOT NULL, "PasswordHash" text NOT NULL,
+    "Email" varchar(200) NOT NULL DEFAULT '', "Role" varchar(20) NOT NULL DEFAULT 'User',
+    "IsActive" boolean NOT NULL DEFAULT true,
+    "CreatedAt" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP, "UpdatedAt" timestamp,
+    CONSTRAINT "AK_Users_Username" UNIQUE ("Username")
+);
 ```
 
 ### 3. MongoDB (logs de auditoría)
@@ -134,55 +142,91 @@ El proyecto usa InMemory por defecto para desarrollo. Para usar SQL Server real,
 }
 ```
 
-Si no se configura, se usa `mongodb://localhost:27017` por defecto.
+Si no se configura, usa `mongodb://localhost:27017` por defecto.
 
-### 4. Ejecutar
+### 4. Ejecutar API
 
 ```bash
 cd src/API
-dotnet run --launch-profile https
+dotnet run
 ```
 
-Swagger disponible en: `https://localhost:7224/swagger`
+Swagger: `http://localhost:5036/swagger`
 
-### 5. Usuarios de prueba (JWT)
+### 5. Ejecutar Frontend
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Abrir `http://localhost:5173`
+
+## Autenticación
+
+Los usuarios se almacenan en la tabla `Users` con passwords hasheados (BCrypt). Al iniciar la API por primera vez, se crean automáticamente:
 
 | Usuario | Contraseña | Rol |
 |---------|-----------|-----|
 | `admin` | `admin123` | Admin |
 | `user` | `user123` | User |
 
-`POST /api/v1/auth/login` con `{ "username": "admin", "password": "admin123" }` devuelve un JWT.
+Endpoints:
+- `POST /api/v1/auth/login` — login
+- `POST /api/v1/auth/register` — registrar nuevo usuario
+- `GET /api/v1/auth/me` — perfil del usuario autenticado (requiere JWT)
+
+## Endpoints
+
+### Category
+| Método | Ruta | Auth |
+|--------|------|------|
+| `GET` | `/api/v1/categories` | No |
+| `GET` | `/api/v1/categories/{id}` | No |
+| `POST` | `/api/v1/categories` | Admin |
+| `PUT` | `/api/v1/categories/{id}` | Admin |
+| `DELETE` | `/api/v1/categories/{id}` | Admin |
+
+### Product
+| Método | Ruta | Auth |
+|--------|------|------|
+| `GET` | `/api/v1/products` | No |
+| `GET` | `/api/v1/products/{id}` | No |
+| `POST` | `/api/v1/products` | Admin |
+| `PUT` | `/api/v1/products/{id}` | Admin |
+| `DELETE` | `/api/v1/products/{id}` | Admin |
+| `GET` | `/api/v1/products/{id}/stock` | No |
+| `GET` | `/api/v1/products/low-stock?threshold=5` | JWT |
+
+### Supplier
+| Método | Ruta | Auth |
+|--------|------|------|
+| `GET` | `/api/v1/suppliers` | No |
+| `GET` | `/api/v1/suppliers/{id}` | No |
+| `POST` | `/api/v1/suppliers` | Admin |
+| `PUT` | `/api/v1/suppliers/{id}` | Admin |
+| `DELETE` | `/api/v1/suppliers/{id}` | Admin |
+
+### Inventory
+| Método | Ruta | Auth |
+|--------|------|------|
+| `GET` | `/api/v1/inventory/{productId}` | No |
+| `POST` | `/api/v1/inventory/adjust` | JWT |
+| `GET` | `/api/v1/inventory/movements/{productId}` | No |
 
 ## Docker
-
-### Requisitos
-
-- Docker Desktop (Windows/Mac) o Docker Engine (Linux)
-
-### Ejecutar todo con docker-compose
 
 ```bash
 docker-compose up -d
 ```
 
-Esto levanta:
-- **SQL Server 2022 Express** — puerto `1433`
-- **MongoDB 7** — puerto `27017`
+Levanta:
+- **PostgreSQL** — puerto `5432` (o configurado)
+- **MongoDB** — puerto `27017`
 - **API** — puerto `5000`
 
-Swagger disponible en: `http://localhost:5000/swagger`
-
-### Detener
-
-```bash
-docker-compose down
-```
-
-Para eliminar volúmenes (borra datos persistentes):
-```bash
-docker-compose down -v
-```
+Swagger: `http://localhost:5000/swagger`
 
 ## Pruebas
 
@@ -190,46 +234,45 @@ docker-compose down -v
 dotnet test tests/InventoryManagement.Tests
 ```
 
-Actualmente **22 tests** (Domain + Application) — todos pasan.
+22 tests (Domain + Application) — todos pasan.
 
 ## Estructura del Proyecto
 
 ```
 InventoryManagementSystem/
 ├── src/
-│   ├── API/                          # ASP.NET Web API
-│   │   ├── Controllers/              # Auth, Categories, Products, Inventory, Suppliers
-│   │   ├── Middleware/               # ExceptionHandlingMiddleware
-│   │   ├── Program.cs                # Configuración (DI, JWT, Swagger, DB)
-│   │   └── appsettings*.json
-│   ├── Application/                  # CQRS + Validación
-│   │   ├── Categories/              # Commands, Queries, Handlers
+│   ├── API/
+│   │   ├── Controllers/           # Auth, Categories, Products, Inventory, Suppliers
+│   │   ├── Middleware/             # ExceptionHandlingMiddleware
+│   │   ├── Program.cs             # DI, JWT, Swagger, DB, seed
+│   │   └── appsettings.json
+│   ├── Application/
+│   │   ├── Categories/            # Commands, Queries, Handlers
 │   │   ├── Products/
 │   │   ├── Suppliers/
 │   │   ├── StockManagement/
-│   │   ├── Common/                  # Behaviors (Validation, AuditLog)
+│   │   ├── Common/                # Behaviors, Interfaces
 │   │   ├── DTOs/
-│   │   └── DependencyInjection.cs
-│   ├── Domain/                       # Entidades y reglas de negocio
-│   │   ├── Entities/                # Product, Category, Supplier, Inventory, StockMovement
-│   │   ├── ValueObjects/            # Money
-│   │   ├── Exceptions/              # InsufficientStockException
-│   │   └── Interfaces/             # IRepository<T>, IAuditLogService
-│   └── Infrastructure/              # Persistencia
-│       ├── Data/                    # ApplicationDbContext, Repositorios
-│       ├── Services/                # MongoAuditLogService
-│       └── DependencyInjection.cs
+│   │   └── Services/              # AuthService
+│   ├── Domain/
+│   │   ├── Entities/              # Category, Product, Supplier, Inventory, StockMovement, User
+│   │   ├── ValueObjects/          # Money
+│   │   ├── Exceptions/            # InsufficientStockException
+│   │   └── Interfaces/            # Repositorios
+│   └── Infrastructure/
+│       ├── Data/                  # ApplicationDbContext, Fluent API
+│       ├── Repositories/          # UserRepository
+│       └── Services/              # MongoAuditLogService
+├── frontend/
+│   ├── src/
+│   │   ├── api/                   # axios + servicios (auth, categories, products, suppliers, inventory)
+│   │   ├── components/            # Navbar, Layout, ProtectedRoute
+│   │   ├── context/               # AuthContext
+│   │   ├── pages/                 # Login, Dashboard, CRUD, Inventory, Movements
+│   │   └── App.jsx                # React Router (12 rutas)
+│   └── vite.config.js             # proxy /api → localhost:5036
 ├── tests/
-│   └── InventoryManagement.Tests/   # xUnit + Moq
-└── docker-compose.yml               # SQL Server + MongoDB + API
+│   └── InventoryManagement.Tests/ # xUnit + Moq (22 tests)
+├── docker-compose.yml
+└── Dockerfile
 ```
-
-## Variables de Entorno (Docker)
-
-| Variable | Descripción | Default |
-|----------|-------------|---------|
-| `ConnectionStrings__DefaultConnection` | Cadena de conexión SQL Server | — |
-| `ConnectionStrings__MongoDb` | Cadena de conexión MongoDB | `mongodb://localhost:27017` |
-| `Jwt__Key` | Clave secreta para firmar JWT | — |
-| `Jwt__Issuer` | Emisor del JWT | `InventoryManagementAPI` |
-| `Jwt__Audience` | Audiencia del JWT | `InventoryManagementClient` |
