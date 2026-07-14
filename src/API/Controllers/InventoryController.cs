@@ -1,6 +1,7 @@
 using InventoryManagement.Application.StockManagement.Commands;
 using InventoryManagement.Application.StockManagement.Queries;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace InventoryManagement.API.Controllers;
@@ -30,6 +31,7 @@ public class InventoryController : ControllerBase
         return Ok(movements);
     }
 
+    [Authorize]
     [HttpPost("adjust")]
     public async Task<IActionResult> AdjustStock([FromBody] AdjustStockCommand command)
     {
