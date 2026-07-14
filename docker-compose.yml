@@ -1,0 +1,40 @@
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      SA_PASSWORD: "Inventory_Admin_123!"
+      ACCEPT_EULA: "Y"
+      MSSQL_PID: "Express"
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqlserver_data:/var/opt/mssql
+
+  mongodb:
+    image: mongo:7
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "5000:80"
+    environment:
+      ASPNETCORE_ENVIRONMENT: "Development"
+      ASPNETCORE_URLS: "http://+:80"
+      ConnectionStrings__DefaultConnection: "Server=sqlserver;Database=InventoryDb;User Id=sa;Password=Inventory_Admin_123!;TrustServerCertificate=True;"
+      ConnectionStrings__MongoDb: "mongodb://mongodb:27017"
+      Jwt__Key: "InventoryManagementSuperSecretKey2024!@#$%"
+      Jwt__Issuer: "InventoryManagementAPI"
+      Jwt__Audience: "InventoryManagementClient"
+    depends_on:
+      - sqlserver
+      - mongodb
+
+volumes:
+  sqlserver_data:
+  mongodb_data:
