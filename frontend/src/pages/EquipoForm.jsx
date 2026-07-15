@@ -98,7 +98,7 @@ export default function EquipoForm() {
     e.preventDefault();
     try {
       const payload = {
-        name: form.name, sku: form.sku, model: form.model, description: form.description,
+        id, name: form.name, sku: form.sku, model: form.model, description: form.description,
         categoryId: form.categoryId, supplierId: form.supplierId || null,
         employeeId: form.employeeId || null,
       };
@@ -150,7 +150,7 @@ export default function EquipoForm() {
               {suppliers.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
             </select>
           </div>
-          <div className="form-group" ref={empRef}>
+          <div className="form-group" ref={empRef} style={{ position: 'relative' }}>
             <label>Asignado a (opcional)</label>
             <input
               value={empSearch}
