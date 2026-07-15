@@ -21,6 +21,7 @@ public class GetProductByIdQueryHandler : IRequestHandler<GetProductByIdQuery, P
         var product = await _context.Products
             .Include(p => p.Category)
             .Include(p => p.Supplier)
+            .Include(p => p.Employee)
             .FirstOrDefaultAsync(p => p.Id == request.Id, cancellationToken)
             ?? throw new KeyNotFoundException($"Product with Id {request.Id} not found.");
 
@@ -35,6 +36,8 @@ public class GetProductByIdQueryHandler : IRequestHandler<GetProductByIdQuery, P
             CategoryName = product.Category.Name,
             SupplierId = product.SupplierId,
             SupplierName = product.Supplier?.Name,
+            EmployeeId = product.EmployeeId,
+            EmployeeName = product.Employee?.FullName,
             IsActive = product.IsActive,
             CreatedAt = product.CreatedAt
         };

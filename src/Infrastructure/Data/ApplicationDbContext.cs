@@ -44,6 +44,11 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext
                   .HasForeignKey(e => e.SupplierId)
                   .OnDelete(DeleteBehavior.SetNull);
 
+            entity.HasOne(e => e.Employee)
+                  .WithMany()
+                  .HasForeignKey(e => e.EmployeeId)
+                  .OnDelete(DeleteBehavior.SetNull);
+
             entity.HasOne<Domain.Entities.Inventory>()
                   .WithOne(e => e.Product)
                   .HasForeignKey<Domain.Entities.Inventory>(e => e.ProductId)

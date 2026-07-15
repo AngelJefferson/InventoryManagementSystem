@@ -47,6 +47,7 @@ export default function Equipos() {
               <th>S/N</th>
               <th>Categoría</th>
               <th>Proveedor</th>
+              <th>Asignado a</th>
               <th>Acciones</th>
             </tr>
           </thead>
@@ -58,6 +59,7 @@ export default function Equipos() {
                 <td><code>{p.sku}</code></td>
                 <td>{p.categoryName}</td>
                 <td>{p.supplierName || <span className="text-muted">—</span>}</td>
+                <td>{p.employeeName || <span className="text-muted">—</span>}</td>
                 <td className="actions">
                   <Link to={`/equipos/${p.id}/editar`} className="btn btn-sm">Editar</Link>
                   <button onClick={() => handleDelete(p.id)} className="btn btn-sm btn-danger">Eliminar</button>
@@ -65,7 +67,7 @@ export default function Equipos() {
               </tr>
             ))}
             {filtered.length === 0 && (
-              <tr><td colSpan="6" className="text-center">No se encontraron equipos</td></tr>
+              <tr><td colSpan="7" className="text-center">No se encontraron equipos</td></tr>
             )}
           </tbody>
         </table>

@@ -13,7 +13,8 @@ public record CreateProductCommand(
     string SKU,
     string Model,
     Guid CategoryId,
-    Guid? SupplierId
+    Guid? SupplierId,
+    Guid? EmployeeId
 ) : IRequest<ProductDto>;
 
 public class CreateProductCommandHandler : IRequestHandler<CreateProductCommand, ProductDto>
@@ -44,7 +45,8 @@ public class CreateProductCommandHandler : IRequestHandler<CreateProductCommand,
             request.SKU,
             request.CategoryId,
             request.SupplierId,
-            request.Model
+            request.Model,
+            request.EmployeeId
         );
 
         _context.Products.Add(product);

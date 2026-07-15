@@ -13,7 +13,8 @@ public record UpdateProductCommand(
     string SKU,
     string Model,
     Guid CategoryId,
-    Guid? SupplierId
+    Guid? SupplierId,
+    Guid? EmployeeId
 ) : IRequest<ProductDto>;
 
 public class UpdateProductCommandHandler : IRequestHandler<UpdateProductCommand, ProductDto>
@@ -38,6 +39,7 @@ public class UpdateProductCommandHandler : IRequestHandler<UpdateProductCommand,
         product.SetModel(request.Model);
         product.AssignCategory(request.CategoryId);
         product.AssignSupplier(request.SupplierId);
+        product.AssignEmployee(request.EmployeeId);
 
         await _context.SaveChangesAsync(cancellationToken);
 

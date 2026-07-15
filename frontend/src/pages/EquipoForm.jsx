@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { getProduct, createProduct, updateProduct } from '../api/productService';
 import { getCategories } from '../api/categoryService';
 import { getSuppliers } from '../api/supplierService';
+import { getEmployees } from '../api/employeeService';
 
 export default function EquipoForm() {
   const { id } = useParams();
@@ -10,28 +11,45 @@ export default function EquipoForm() {
   const isEdit = Boolean(id);
   const [categories, setCategories] = useState([]);
   const [suppliers, setSuppliers] = useState([]);
+  const [employees, setEmployees] = useState([]);
   const [form, setForm] = useState({
-    name: '', sku: '', model: '', description: '', categoryId: '', supplierId: '',
+    name: '', sku: '', model: '', description: '', categoryId: '', supplierId: '', employeeId: '',
   });
   const [error, setError] = useState('');
   const [showScanner, setShowScanner] = useState(false);
   const [ocrText, setOcrText] = useState('');
+  const [empSearch, setEmpSearch] = useState('');
+  const [empOpen, setEmpOpen] = useState(false);
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const streamRef = useRef(null);
+  const empRef = useRef(null);
 
   useEffect(() => {
     getCategories().then((r) => setCategories(r.data));
     getSuppliers().then((r) => setSuppliers(r.data));
+    getEmployees().then((r) => setEmployees(r.data));
     if (isEdit) getProduct(id).then((r) => {
       const p = r.data;
       setForm({
         name: p.name, sku: p.sku, model: p.model || '', description: p.description || '',
-        categoryId: p.categoryId, supplierId: p.supplierId || '',
+        categoryId: p.categoryId, supplierId: p.supplierId || '', employeeId: p.employeeId || '',
       });
+      if (p.employeeName) setEmpSearch(p.employeeName);
     });
+    document.addEventListener('mousedown', (e) => { if (empRef.current && !empRef.current.contains(e.target)) setEmpOpen(false); });
     return () => stopCamera();
   }, [id]);
+
+  const filteredEmps = employees.filter((e) =>
+    e.fullName.toLowerCase().includes(empSearch.toLowerCase())
+  );
+
+  const selectEmployee = (emp) => {
+    setForm({ ...form, employeeId: emp.id });
+    setEmpSearch(emp.fullName);
+    setEmpOpen(false);
+  };
 
   const startCamera = async () => {
     try {
@@ -80,8 +98,9 @@ export default function EquipoForm() {
     e.preventDefault();
     try {
       const payload = {
-        ...form,
-        supplierId: form.supplierId || null,
+        name: form.name, sku: form.sku, model: form.model, description: form.description,
+        categoryId: form.categoryId, supplierId: form.supplierId || null,
+        employeeId: form.employeeId || null,
       };
       if (isEdit) await updateProduct(id, payload);
       else await createProduct(payload);
@@ -130,6 +149,34 @@ export default function EquipoForm() {
               <option value="">Sin proveedor</option>
               {suppliers.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
             </select>
+          </div>
+          <div className="form-group" ref={empRef}>
+            <label>Asignado a (opcional)</label>
+            <input
+              value={empSearch}
+              onChange={(e) => { setEmpSearch(e.target.value); setEmpOpen(true); setForm({ ...form, employeeId: '' }); }}
+              onFocus={() => setEmpOpen(true)}
+              placeholder="Escribe para buscar empleado..."
+              style={{ width: '100%' }}
+            />
+            {empOpen && (
+              <div style={{
+                position: 'absolute', zIndex: 100, background: '#fff', border: '1px solid var(--border)',
+                borderRadius: 'var(--radius)', maxHeight: 200, overflowY: 'auto', width: '100%', marginTop: 2,
+                boxShadow: 'var(--shadow)',
+              }}>
+                {filteredEmps.length === 0 ? (
+                  <div style={{ padding: 10, color: 'var(--text-muted)', fontSize: '0.85rem' }}>Sin resultados</div>
+                ) : filteredEmps.map((e) => (
+                  <div key={e.id} onClick={() => selectEmployee(e)}
+                    style={{ padding: '8px 12px', cursor: 'pointer', fontSize: '0.9rem', borderBottom: '1px solid var(--border)' }}
+                    onMouseEnter={(e) => e.target.style.background = 'var(--bg)'}
+                    onMouseLeave={(e) => e.target.style.background = 'transparent'}>
+                    {e.fullName} {e.department ? `(${e.department})` : ''}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
 

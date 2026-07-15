@@ -11,13 +11,15 @@ public class Product
     public Category Category { get; private set; } = null!;
     public Guid? SupplierId { get; private set; }
     public Supplier? Supplier { get; private set; }
+    public Guid? EmployeeId { get; private set; }
+    public Employee? Employee { get; private set; }
     public bool IsActive { get; private set; }
     public DateTime CreatedAt { get; private set; }
     public DateTime? UpdatedAt { get; private set; }
 
     private Product() { }
 
-    public Product(string name, string description, string sku, Guid categoryId, Guid? supplierId = null, string model = "")
+    public Product(string name, string description, string sku, Guid categoryId, Guid? supplierId = null, string model = "", Guid? employeeId = null)
     {
         Id = Guid.NewGuid();
         SetName(name);
@@ -26,6 +28,7 @@ public class Product
         SetModel(model);
         CategoryId = categoryId;
         SupplierId = supplierId;
+        EmployeeId = employeeId;
         IsActive = true;
         CreatedAt = DateTime.UtcNow;
     }
@@ -65,6 +68,12 @@ public class Product
     public void AssignSupplier(Guid? supplierId)
     {
         SupplierId = supplierId;
+        UpdatedAt = DateTime.UtcNow;
+    }
+
+    public void AssignEmployee(Guid? employeeId)
+    {
+        EmployeeId = employeeId;
         UpdatedAt = DateTime.UtcNow;
     }
 
