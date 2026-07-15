@@ -1,5 +1,3 @@
-using InventoryManagement.Domain.ValueObjects;
-
 namespace InventoryManagement.Domain.Entities;
 
 public class Product
@@ -9,7 +7,6 @@ public class Product
     public string Description { get; private set; } = null!;
     public string SKU { get; private set; } = null!;
     public string Model { get; private set; } = string.Empty;
-    public Money Price { get; private set; } = null!;
     public Guid CategoryId { get; private set; }
     public Category Category { get; private set; } = null!;
     public Guid? SupplierId { get; private set; }
@@ -20,14 +17,13 @@ public class Product
 
     private Product() { }
 
-    public Product(string name, string description, string sku, Money price, Guid categoryId, Guid? supplierId = null, string model = "")
+    public Product(string name, string description, string sku, Guid categoryId, Guid? supplierId = null, string model = "")
     {
         Id = Guid.NewGuid();
         SetName(name);
         SetDescription(description);
         SetSKU(sku);
         SetModel(model);
-        SetPrice(price);
         CategoryId = categoryId;
         SupplierId = supplierId;
         IsActive = true;
@@ -57,12 +53,6 @@ public class Product
     public void SetModel(string model)
     {
         Model = model ?? string.Empty;
-        UpdatedAt = DateTime.UtcNow;
-    }
-
-    public void SetPrice(Money price)
-    {
-        Price = price ?? throw new ArgumentNullException(nameof(price));
         UpdatedAt = DateTime.UtcNow;
     }
 

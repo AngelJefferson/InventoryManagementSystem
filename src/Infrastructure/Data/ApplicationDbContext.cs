@@ -1,6 +1,5 @@
 using InventoryManagement.Application.Common.Interfaces;
 using InventoryManagement.Domain.Entities;
-using InventoryManagement.Domain.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
@@ -39,12 +38,6 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext
             entity.Property(e => e.SKU).HasMaxLength(50).IsRequired();
             entity.HasIndex(e => e.SKU).IsUnique();
             entity.Property(e => e.Model).HasMaxLength(200);
-
-            entity.OwnsOne(e => e.Price, price =>
-            {
-                price.Property(p => p.Amount).HasColumnName("Price").HasColumnType("decimal(18,2)");
-                price.Property(p => p.Currency).HasColumnName("Currency").HasMaxLength(3).IsRequired();
-            });
 
             entity.HasOne(e => e.Supplier)
                   .WithMany(e => e.Products)

@@ -1,7 +1,6 @@
 using FluentValidation;
 using InventoryManagement.Application.Common.Interfaces;
 using InventoryManagement.Application.DTOs;
-using InventoryManagement.Domain.ValueObjects;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,8 +12,6 @@ public record UpdateProductCommand(
     string Description,
     string SKU,
     string Model,
-    decimal Price,
-    string Currency,
     Guid CategoryId,
     Guid? SupplierId
 ) : IRequest<ProductDto>;
@@ -39,7 +36,6 @@ public class UpdateProductCommandHandler : IRequestHandler<UpdateProductCommand,
         product.SetDescription(request.Description);
         product.SetSKU(request.SKU);
         product.SetModel(request.Model);
-        product.SetPrice(new Money(request.Price, request.Currency));
         product.AssignCategory(request.CategoryId);
         product.AssignSupplier(request.SupplierId);
 
@@ -52,8 +48,6 @@ public class UpdateProductCommandHandler : IRequestHandler<UpdateProductCommand,
             Description = product.Description,
             SKU = product.SKU,
             Model = product.Model,
-            Price = product.Price.Amount,
-            Currency = product.Price.Currency,
             CategoryId = product.CategoryId,
             CategoryName = product.Category?.Name ?? string.Empty,
             SupplierId = product.SupplierId,
@@ -70,7 +64,6 @@ public class UpdateProductCommandValidator : AbstractValidator<UpdateProductComm
         RuleFor(v => v.Id).NotEmpty();
         RuleFor(v => v.Name).NotEmpty().MaximumLength(200);
         RuleFor(v => v.SKU).NotEmpty().MaximumLength(50);
-        RuleFor(v => v.Price).GreaterThanOrEqualTo(0);
         RuleFor(v => v.CategoryId).NotEmpty();
     }
 }

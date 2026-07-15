@@ -12,7 +12,6 @@ export default function EquipoForm() {
   const [suppliers, setSuppliers] = useState([]);
   const [form, setForm] = useState({
     name: '', sku: '', model: '', description: '', categoryId: '', supplierId: '',
-    price: { amount: 0, currency: 'DOP' },
   });
   const [error, setError] = useState('');
   const [showScanner, setShowScanner] = useState(false);
@@ -29,7 +28,6 @@ export default function EquipoForm() {
       setForm({
         name: p.name, sku: p.sku, model: p.model || '', description: p.description || '',
         categoryId: p.categoryId, supplierId: p.supplierId || '',
-        price: p.price || { amount: 0, currency: 'DOP' },
       });
     });
     return () => stopCamera();
@@ -84,7 +82,6 @@ export default function EquipoForm() {
       const payload = {
         ...form,
         supplierId: form.supplierId || null,
-        price: { amount: parseFloat(form.price.amount), currency: form.price.currency },
       };
       if (isEdit) await updateProduct(id, payload);
       else await createProduct(payload);
@@ -134,20 +131,6 @@ export default function EquipoForm() {
               {suppliers.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
             </select>
           </div>
-          <div className="form-group">
-            <label>Precio</label>
-            <input type="number" step="0.01" value={form.price.amount}
-              onChange={(e) => setForm({ ...form, price: { ...form.price, amount: e.target.value } })} required />
-          </div>
-        </div>
-        <div className="form-group">
-          <label>Moneda</label>
-          <select value={form.price.currency}
-            onChange={(e) => setForm({ ...form, price: { ...form.price, currency: e.target.value } })}>
-            <option value="DOP">DOP</option>
-            <option value="USD">USD</option>
-            <option value="EUR">EUR</option>
-          </select>
         </div>
 
         <div className="form-group">

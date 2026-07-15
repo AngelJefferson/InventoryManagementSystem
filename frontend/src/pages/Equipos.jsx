@@ -45,7 +45,6 @@ export default function Equipos() {
               <th>Nombre</th>
               <th>Modelo</th>
               <th>S/N</th>
-              <th>Precio</th>
               <th>Categoría</th>
               <th>Proveedor</th>
               <th>Acciones</th>
@@ -57,7 +56,6 @@ export default function Equipos() {
                 <td>{p.name}</td>
                 <td>{p.model || <span className="text-muted">—</span>}</td>
                 <td><code>{p.sku}</code></td>
-                <td>${p.price?.amount?.toFixed(2)}</td>
                 <td>{p.categoryName}</td>
                 <td>{p.supplierName || <span className="text-muted">—</span>}</td>
                 <td className="actions">
@@ -67,7 +65,7 @@ export default function Equipos() {
               </tr>
             ))}
             {filtered.length === 0 && (
-              <tr><td colSpan="7" className="text-center">No se encontraron equipos</td></tr>
+              <tr><td colSpan="6" className="text-center">No se encontraron equipos</td></tr>
             )}
           </tbody>
         </table>

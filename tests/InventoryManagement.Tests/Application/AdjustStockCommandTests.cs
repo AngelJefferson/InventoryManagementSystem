@@ -2,7 +2,6 @@ using InventoryManagement.Application.Common.Interfaces;
 using InventoryManagement.Application.StockManagement.Commands;
 using InventoryManagement.Domain.Entities;
 using InventoryManagement.Domain.Exceptions;
-using InventoryManagement.Domain.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using InventoryManagement.Infrastructure.Data;
 
@@ -22,8 +21,7 @@ public class AdjustStockCommandTests
         context.Categories.Add(category);
         await context.SaveChangesAsync(default);
 
-        var product = new Product("Test Product", "desc", "TST-001",
-            new Money(100m), category.Id);
+        var product = new Product("Test Product", "desc", "TST-001", category.Id);
         context.Products.Add(product);
         await context.SaveChangesAsync(default);
 

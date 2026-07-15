@@ -31,8 +31,6 @@ public class GetProductByIdQueryHandler : IRequestHandler<GetProductByIdQuery, P
             Description = product.Description,
             SKU = product.SKU,
             Model = product.Model,
-            Price = product.Price.Amount,
-            Currency = product.Price.Currency,
             CategoryId = product.CategoryId,
             CategoryName = product.Category.Name,
             SupplierId = product.SupplierId,
