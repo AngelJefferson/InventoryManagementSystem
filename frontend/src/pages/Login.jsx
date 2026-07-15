@@ -48,6 +48,11 @@ export default function Login() {
         <button type="submit" className="btn btn-primary btn-block">
           {isRegister ? 'Registrarse' : 'Iniciar Sesión'}
         </button>
+        {!isRegister && (
+          <p className="login-hint" style={{ marginTop: 8 }}>
+            <a href="#" onClick={(e) => { e.preventDefault(); alert('Contacta al administrador para restablecer tu contraseña.'); }}>¿Olvidaste tu contraseña?</a>
+          </p>
+        )}
         <p className="login-hint">
           {isRegister ? (
             <>¿Ya tienes cuenta? <a href="#" onClick={(e) => { e.preventDefault(); setIsRegister(false); setError(''); }}>Inicia sesión</a></>
@@ -55,7 +60,6 @@ export default function Login() {
             <>¿No tienes cuenta? <a href="#" onClick={(e) => { e.preventDefault(); setIsRegister(true); setError(''); }}>Regístrate</a></>
           )}
         </p>
-        {!isRegister && <p className="login-hint" style={{ marginTop: 4 }}>Demo: admin / admin123</p>}
       </form>
     </div>
   );

@@ -12,6 +12,7 @@ public record UpdateProductCommand(
     string Name,
     string Description,
     string SKU,
+    string Model,
     decimal Price,
     string Currency,
     Guid CategoryId,
@@ -37,6 +38,7 @@ public class UpdateProductCommandHandler : IRequestHandler<UpdateProductCommand,
         product.SetName(request.Name);
         product.SetDescription(request.Description);
         product.SetSKU(request.SKU);
+        product.SetModel(request.Model);
         product.SetPrice(new Money(request.Price, request.Currency));
         product.AssignCategory(request.CategoryId);
         product.AssignSupplier(request.SupplierId);
@@ -49,6 +51,7 @@ public class UpdateProductCommandHandler : IRequestHandler<UpdateProductCommand,
             Name = product.Name,
             Description = product.Description,
             SKU = product.SKU,
+            Model = product.Model,
             Price = product.Price.Amount,
             Currency = product.Price.Currency,
             CategoryId = product.CategoryId,

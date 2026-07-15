@@ -22,6 +22,7 @@ export default function Equipos() {
 
   const filtered = products.filter((p) =>
     p.name.toLowerCase().includes(search.toLowerCase()) ||
+    (p.model || '').toLowerCase().includes(search.toLowerCase()) ||
     p.sku.toLowerCase().includes(search.toLowerCase())
   );
 
@@ -34,7 +35,7 @@ export default function Equipos() {
         <Link to="/equipos/nuevo" className="btn btn-primary">+ Nuevo Equipo</Link>
       </div>
       <div className="search-bar">
-        <input placeholder="Buscar equipo por nombre o SKU..." value={search}
+        <input placeholder="Buscar equipo por nombre, modelo o S/N..." value={search}
           onChange={(e) => setSearch(e.target.value)} />
       </div>
       <div className="table-container">
@@ -42,11 +43,11 @@ export default function Equipos() {
           <thead>
             <tr>
               <th>Nombre</th>
-              <th>SKU</th>
+              <th>Modelo</th>
+              <th>S/N</th>
               <th>Precio</th>
               <th>Categoría</th>
               <th>Proveedor</th>
-              <th>Stock</th>
               <th>Acciones</th>
             </tr>
           </thead>
@@ -54,15 +55,13 @@ export default function Equipos() {
             {filtered.map((p) => (
               <tr key={p.id}>
                 <td>{p.name}</td>
-                <td>{p.sku}</td>
+                <td>{p.model || <span className="text-muted">—</span>}</td>
+                <td><code>{p.sku}</code></td>
                 <td>${p.price?.amount?.toFixed(2)}</td>
                 <td>{p.categoryName}</td>
                 <td>{p.supplierName || <span className="text-muted">—</span>}</td>
-                <td>{p.stockQuantity ?? 0}</td>
                 <td className="actions">
                   <Link to={`/equipos/${p.id}/editar`} className="btn btn-sm">Editar</Link>
-                  <Link to={`/equipos/${p.id}/inventario`} className="btn btn-sm">Stock</Link>
-                  <Link to={`/equipos/${p.id}/movimientos`} className="btn btn-sm">Mov.</Link>
                   <button onClick={() => handleDelete(p.id)} className="btn btn-sm btn-danger">Eliminar</button>
                 </td>
               </tr>

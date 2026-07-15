@@ -45,7 +45,6 @@ export default function Empleados() {
               <th>Departamento</th>
               <th>Puesto</th>
               <th>Correo</th>
-              <th>Teléfono</th>
               <th>Equipos asignados</th>
               <th>Acciones</th>
             </tr>
@@ -57,7 +56,6 @@ export default function Empleados() {
                 <td>{e.department}</td>
                 <td>{e.position}</td>
                 <td>{e.email}</td>
-                <td>{e.phone}</td>
                 <td>{e.assignedEquipmentCount ?? 0}</td>
                 <td className="actions">
                   <Link to={`/empleados/${e.id}/editar`} className="btn btn-sm">Editar</Link>
@@ -66,7 +64,7 @@ export default function Empleados() {
               </tr>
             ))}
             {filtered.length === 0 && (
-              <tr><td colSpan="7" className="text-center">No se encontraron empleados</td></tr>
+              <tr><td colSpan="6" className="text-center">No se encontraron empleados</td></tr>
             )}
           </tbody>
         </table>

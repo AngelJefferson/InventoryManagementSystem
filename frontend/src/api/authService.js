@@ -8,3 +8,6 @@ export const register = (username, password, email, role = 'User') =>
 
 export const getMe = () =>
   api.get('/auth/me');
+
+export const changePassword = (oldPassword, newPassword) =>
+  api.post('/auth/change-password', { oldPassword, newPassword });

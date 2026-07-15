@@ -38,6 +38,7 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext
             entity.Property(e => e.Description).HasMaxLength(2000);
             entity.Property(e => e.SKU).HasMaxLength(50).IsRequired();
             entity.HasIndex(e => e.SKU).IsUnique();
+            entity.Property(e => e.Model).HasMaxLength(200);
 
             entity.OwnsOne(e => e.Price, price =>
             {
@@ -103,7 +104,6 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext
             entity.Property(e => e.Department).HasMaxLength(100);
             entity.Property(e => e.Position).HasMaxLength(100);
             entity.Property(e => e.Email).HasMaxLength(200);
-            entity.Property(e => e.Phone).HasMaxLength(50);
         });
     }
 }

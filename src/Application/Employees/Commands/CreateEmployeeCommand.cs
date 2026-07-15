@@ -6,7 +6,7 @@ using MediatR;
 
 namespace InventoryManagement.Application.Employees.Commands;
 
-public record CreateEmployeeCommand(string FullName, string Department, string Position, string Email, string Phone) : IRequest<EmployeeDto>;
+public record CreateEmployeeCommand(string FullName, string Department, string Position, string Email) : IRequest<EmployeeDto>;
 
 public class CreateEmployeeCommandHandler : IRequestHandler<CreateEmployeeCommand, EmployeeDto>
 {
@@ -19,7 +19,7 @@ public class CreateEmployeeCommandHandler : IRequestHandler<CreateEmployeeComman
 
     public async Task<EmployeeDto> Handle(CreateEmployeeCommand request, CancellationToken cancellationToken)
     {
-        var employee = new Employee(request.FullName, request.Department, request.Position, request.Email, request.Phone);
+        var employee = new Employee(request.FullName, request.Department, request.Position, request.Email);
 
         _context.Employees.Add(employee);
         await _context.SaveChangesAsync(cancellationToken);
@@ -31,7 +31,6 @@ public class CreateEmployeeCommandHandler : IRequestHandler<CreateEmployeeComman
             Department = employee.Department,
             Position = employee.Position,
             Email = employee.Email,
-            Phone = employee.Phone,
             IsActive = employee.IsActive,
             CreatedAt = employee.CreatedAt
         };
@@ -49,6 +48,5 @@ public class CreateEmployeeCommandValidator : AbstractValidator<CreateEmployeeCo
         RuleFor(v => v.Department).MaximumLength(100);
         RuleFor(v => v.Position).MaximumLength(100);
         RuleFor(v => v.Email).MaximumLength(200);
-        RuleFor(v => v.Phone).MaximumLength(50);
     }
 }

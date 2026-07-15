@@ -12,11 +12,11 @@ public record CreateProductCommand(
     string Name,
     string Description,
     string SKU,
+    string Model,
     decimal Price,
     string Currency,
     Guid CategoryId,
-    Guid? SupplierId,
-    int InitialStock
+    Guid? SupplierId
 ) : IRequest<ProductDto>;
 
 public class CreateProductCommandHandler : IRequestHandler<CreateProductCommand, ProductDto>
@@ -47,13 +47,11 @@ public class CreateProductCommandHandler : IRequestHandler<CreateProductCommand,
             request.SKU,
             new Money(request.Price, request.Currency),
             request.CategoryId,
-            request.SupplierId
+            request.SupplierId,
+            request.Model
         );
 
-        var inventory = new Domain.Entities.Inventory(product.Id, request.InitialStock);
-
         _context.Products.Add(product);
-        _context.Inventories.Add(inventory);
         await _context.SaveChangesAsync(cancellationToken);
 
         return new ProductDto
@@ -62,6 +60,7 @@ public class CreateProductCommandHandler : IRequestHandler<CreateProductCommand,
             Name = product.Name,
             Description = product.Description,
             SKU = product.SKU,
+            Model = product.Model,
             Price = product.Price.Amount,
             Currency = product.Price.Currency,
             CategoryId = product.CategoryId,
@@ -80,6 +79,6 @@ public class CreateProductCommandValidator : AbstractValidator<CreateProductComm
         RuleFor(v => v.SKU).NotEmpty().MaximumLength(50);
         RuleFor(v => v.Price).GreaterThanOrEqualTo(0);
         RuleFor(v => v.CategoryId).NotEmpty();
-        RuleFor(v => v.InitialStock).GreaterThanOrEqualTo(0);
+        RuleFor(v => v.Model).MaximumLength(200);
     }
 }

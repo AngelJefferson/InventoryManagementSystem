@@ -9,8 +9,6 @@ import Categorias from './pages/Categorias';
 import CategoriaForm from './pages/CategoriaForm';
 import Proveedores from './pages/Proveedores';
 import ProveedorForm from './pages/ProveedorForm';
-import Inventario from './pages/Inventario';
-import Movimientos from './pages/Movimientos';
 import Empleados from './pages/Empleados';
 import EmpleadoForm from './pages/EmpleadoForm';
 import './App.css';
@@ -24,8 +22,6 @@ export default function App() {
         <Route path="equipos" element={<Equipos />} />
         <Route path="equipos/nuevo" element={<EquipoForm />} />
         <Route path="equipos/:id/editar" element={<EquipoForm />} />
-        <Route path="equipos/:id/inventario" element={<Inventario />} />
-        <Route path="equipos/:id/movimientos" element={<Movimientos />} />
         <Route path="categorias" element={<Categorias />} />
         <Route path="categorias/nueva" element={<CategoriaForm />} />
         <Route path="categorias/:id/editar" element={<CategoriaForm />} />

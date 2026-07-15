@@ -8,6 +8,7 @@ public class Product
     public string Name { get; private set; } = null!;
     public string Description { get; private set; } = null!;
     public string SKU { get; private set; } = null!;
+    public string Model { get; private set; } = string.Empty;
     public Money Price { get; private set; } = null!;
     public Guid CategoryId { get; private set; }
     public Category Category { get; private set; } = null!;
@@ -19,12 +20,13 @@ public class Product
 
     private Product() { }
 
-    public Product(string name, string description, string sku, Money price, Guid categoryId, Guid? supplierId = null)
+    public Product(string name, string description, string sku, Money price, Guid categoryId, Guid? supplierId = null, string model = "")
     {
         Id = Guid.NewGuid();
         SetName(name);
         SetDescription(description);
         SetSKU(sku);
+        SetModel(model);
         SetPrice(price);
         CategoryId = categoryId;
         SupplierId = supplierId;
@@ -49,6 +51,12 @@ public class Product
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(sku);
         SKU = sku.ToUpperInvariant();
+        UpdatedAt = DateTime.UtcNow;
+    }
+
+    public void SetModel(string model)
+    {
+        Model = model ?? string.Empty;
         UpdatedAt = DateTime.UtcNow;
     }
 

@@ -26,7 +26,6 @@ public class GetAllEmployeesQueryHandler : IRequestHandler<GetAllEmployeesQuery,
                 Department = e.Department,
                 Position = e.Position,
                 Email = e.Email,
-                Phone = e.Phone,
                 IsActive = e.IsActive,
                 CreatedAt = e.CreatedAt
             })

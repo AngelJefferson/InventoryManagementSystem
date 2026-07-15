@@ -44,6 +44,18 @@ public class AuthService : IAuthService
         return new AuthResponse(token, user.Username, user.Role);
     }
 
+    public async Task ChangePasswordAsync(string username, string oldPassword, string newPassword)
+    {
+        var user = await _userRepo.GetByUsernameAsync(username)
+            ?? throw new UnauthorizedAccessException("Usuario no encontrado");
+
+        if (!BCrypt.Net.BCrypt.Verify(oldPassword, user.PasswordHash))
+            throw new UnauthorizedAccessException("Contraseña actual incorrecta");
+
+        user.UpdatePassword(BCrypt.Net.BCrypt.HashPassword(newPassword));
+        await _userRepo.UpdateAsync(user);
+    }
+
     private string GenerateToken(User user)
     {
         var jwtSettings = _configuration.GetSection("Jwt");

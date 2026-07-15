@@ -45,6 +45,22 @@ public class AuthController : ControllerBase
     }
 
     [Authorize]
+    [HttpPost("change-password")]
+    public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest request)
+    {
+        try
+        {
+            var username = User.FindFirst(System.Security.Claims.ClaimTypes.Name)?.Value ?? "unknown";
+            await _authService.ChangePasswordAsync(username, request.OldPassword, request.NewPassword);
+            return Ok(new { message = "Contraseña actualizada correctamente" });
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            return Unauthorized(new { error = ex.Message });
+        }
+    }
+
+    [Authorize]
     [HttpGet("me")]
     public IActionResult GetMe()
     {

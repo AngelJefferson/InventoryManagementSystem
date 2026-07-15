@@ -29,7 +29,6 @@ public class GetEmployeeByIdQueryHandler : IRequestHandler<GetEmployeeByIdQuery,
             Department = employee.Department,
             Position = employee.Position,
             Email = employee.Email,
-            Phone = employee.Phone,
             IsActive = employee.IsActive,
             CreatedAt = employee.CreatedAt
         };

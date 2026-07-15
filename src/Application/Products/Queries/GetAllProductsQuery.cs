@@ -31,7 +31,8 @@ public class GetAllProductsQueryHandler : IRequestHandler<GetAllProductsQuery, I
             var term = request.SearchTerm.ToLower();
             query = query.Where(p =>
                 p.Name.ToLower().Contains(term) ||
-                p.SKU.ToLower().Contains(term));
+                p.SKU.ToLower().Contains(term) ||
+                p.Model.ToLower().Contains(term));
         }
 
         return await query
@@ -41,6 +42,7 @@ public class GetAllProductsQueryHandler : IRequestHandler<GetAllProductsQuery, I
                 Name = p.Name,
                 Description = p.Description,
                 SKU = p.SKU,
+                Model = p.Model,
                 Price = p.Price.Amount,
                 Currency = p.Price.Currency,
                 CategoryId = p.CategoryId,

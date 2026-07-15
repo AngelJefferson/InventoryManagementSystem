@@ -11,8 +11,8 @@ export default function EquipoForm() {
   const [categories, setCategories] = useState([]);
   const [suppliers, setSuppliers] = useState([]);
   const [form, setForm] = useState({
-    name: '', sku: '', description: '', categoryId: '', supplierId: '',
-    price: { amount: 0, currency: 'USD' },
+    name: '', sku: '', model: '', description: '', categoryId: '', supplierId: '',
+    price: { amount: 0, currency: 'DOP' },
   });
   const [error, setError] = useState('');
   const [showScanner, setShowScanner] = useState(false);
@@ -27,9 +27,9 @@ export default function EquipoForm() {
     if (isEdit) getProduct(id).then((r) => {
       const p = r.data;
       setForm({
-        name: p.name, sku: p.sku, description: p.description || '',
+        name: p.name, sku: p.sku, model: p.model || '', description: p.description || '',
         categoryId: p.categoryId, supplierId: p.supplierId || '',
-        price: p.price || { amount: 0, currency: 'USD' },
+        price: p.price || { amount: 0, currency: 'DOP' },
       });
     });
     return () => stopCamera();
@@ -68,7 +68,11 @@ export default function EquipoForm() {
       const { data } = await Tesseract.recognize(imageData, 'spa');
       setOcrText(data.text);
       const lines = data.text.split('\n').filter((l) => l.trim());
-      if (lines.length > 0 && !form.sku) setForm({ ...form, sku: lines[0].trim() });
+      if (lines.length >= 2 && !form.model && !form.sku) {
+        setForm({ ...form, model: lines[0].trim(), sku: lines[1].trim() });
+      } else if (lines.length > 0 && !form.sku) {
+        setForm({ ...form, sku: lines[0].trim() });
+      }
     } catch (err) {
       alert('Error al procesar la imagen: ' + err.message);
     }
@@ -101,8 +105,21 @@ export default function EquipoForm() {
             <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
           </div>
           <div className="form-group">
-            <label>SKU / Número de serie</label>
-            <input value={form.sku} onChange={(e) => setForm({ ...form, sku: e.target.value })} required />
+            <label>Modelo</label>
+            <input value={form.model} onChange={(e) => setForm({ ...form, model: e.target.value })} />
+          </div>
+        </div>
+        <div className="form-row">
+          <div className="form-group">
+            <label>S/N (Número de serie)</label>
+            <input value={form.sku} onChange={(e) => setForm({ ...form, sku: e.target.value })} required placeholder="Único por equipo" />
+          </div>
+          <div className="form-group">
+            <label>Categoría</label>
+            <select value={form.categoryId} onChange={(e) => setForm({ ...form, categoryId: e.target.value })} required>
+              <option value="">Seleccionar categoría</option>
+              {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+            </select>
           </div>
         </div>
         <div className="form-group">
@@ -111,35 +128,26 @@ export default function EquipoForm() {
         </div>
         <div className="form-row">
           <div className="form-group">
-            <label>Categoría</label>
-            <select value={form.categoryId} onChange={(e) => setForm({ ...form, categoryId: e.target.value })} required>
-              <option value="">Seleccionar categoría</option>
-              {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
-            </select>
-          </div>
-          <div className="form-group">
             <label>Proveedor (opcional)</label>
             <select value={form.supplierId} onChange={(e) => setForm({ ...form, supplierId: e.target.value })}>
               <option value="">Sin proveedor</option>
               {suppliers.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
             </select>
           </div>
-        </div>
-        <div className="form-row">
           <div className="form-group">
             <label>Precio</label>
             <input type="number" step="0.01" value={form.price.amount}
               onChange={(e) => setForm({ ...form, price: { ...form.price, amount: e.target.value } })} required />
           </div>
-          <div className="form-group">
-            <label>Moneda</label>
-            <select value={form.price.currency}
-              onChange={(e) => setForm({ ...form, price: { ...form.price, currency: e.target.value } })}>
-              <option value="USD">USD</option>
-              <option value="DOP">DOP</option>
-              <option value="EUR">EUR</option>
-            </select>
-          </div>
+        </div>
+        <div className="form-group">
+          <label>Moneda</label>
+          <select value={form.price.currency}
+            onChange={(e) => setForm({ ...form, price: { ...form.price, currency: e.target.value } })}>
+            <option value="DOP">DOP</option>
+            <option value="USD">USD</option>
+            <option value="EUR">EUR</option>
+          </select>
         </div>
 
         <div className="form-group">
