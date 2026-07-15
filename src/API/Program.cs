@@ -50,7 +50,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new() { Title = "Inventory Management API", Version = "v1" });
+        c.SwaggerDoc("v1", new() { Title = "InventarioCAID API - Control de Equipos Tecnológicos", Version = "v1" });
 
     c.AddSecurityDefinition("Bearer", new()
     {

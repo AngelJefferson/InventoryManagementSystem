@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { getSupplier, createSupplier, updateSupplier } from '../api/supplierService';
 
-export default function SupplierForm() {
+export default function ProveedorForm() {
   const { id } = useParams();
   const navigate = useNavigate();
   const isEdit = Boolean(id);
@@ -21,44 +21,44 @@ export default function SupplierForm() {
     try {
       if (isEdit) await updateSupplier(id, form);
       else await createSupplier(form);
-      navigate('/suppliers');
+      navigate('/proveedores');
     } catch (err) {
-      setError(err.response?.data?.title || 'Error saving supplier');
+      setError(err.response?.data?.title || 'Error al guardar el proveedor');
     }
   };
 
   return (
     <div className="form-page">
-      <h1>{isEdit ? 'Edit Supplier' : 'New Supplier'}</h1>
+      <h1>{isEdit ? 'Editar Proveedor' : 'Nuevo Proveedor'}</h1>
       <form onSubmit={handleSubmit}>
         {error && <div className="alert alert-error">{error}</div>}
         <div className="form-row">
           <div className="form-group">
-            <label>Name</label>
+            <label>Nombre</label>
             <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
           </div>
           <div className="form-group">
-            <label>Contact Name</label>
+            <label>Nombre del contacto</label>
             <input value={form.contactName} onChange={(e) => setForm({ ...form, contactName: e.target.value })} />
           </div>
         </div>
         <div className="form-row">
           <div className="form-group">
-            <label>Email</label>
+            <label>Correo electrónico</label>
             <input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
           </div>
           <div className="form-group">
-            <label>Phone</label>
+            <label>Teléfono</label>
             <input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
           </div>
         </div>
         <div className="form-group">
-          <label>Address</label>
+          <label>Dirección</label>
           <textarea value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} />
         </div>
         <div className="form-actions">
-          <button type="submit" className="btn btn-primary">{isEdit ? 'Update' : 'Create'}</button>
-          <button type="button" onClick={() => navigate('/suppliers')} className="btn">Cancel</button>
+          <button type="submit" className="btn btn-primary">{isEdit ? 'Actualizar' : 'Crear'}</button>
+          <button type="button" onClick={() => navigate('/proveedores')} className="btn">Cancelar</button>
         </div>
       </form>
     </div>

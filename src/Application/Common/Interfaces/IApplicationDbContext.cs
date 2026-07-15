@@ -11,6 +11,7 @@ public interface IApplicationDbContext
     DbSet<Domain.Entities.Inventory> Inventories { get; }
     DbSet<StockMovement> StockMovements { get; }
     DbSet<User> Users { get; }
+    DbSet<Employee> Employees { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

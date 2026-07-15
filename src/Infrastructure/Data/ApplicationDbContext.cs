@@ -16,6 +16,7 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext
     public DbSet<Domain.Entities.Inventory> Inventories => Set<Domain.Entities.Inventory>();
     public DbSet<StockMovement> StockMovements => Set<StockMovement>();
     public DbSet<User> Users => Set<User>();
+    public DbSet<Employee> Employees => Set<Employee>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -93,6 +94,16 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext
             entity.Property(e => e.PasswordHash).IsRequired();
             entity.Property(e => e.Email).HasMaxLength(200);
             entity.Property(e => e.Role).HasMaxLength(20).IsRequired();
+        });
+
+        modelBuilder.Entity<Employee>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.FullName).HasMaxLength(200).IsRequired();
+            entity.Property(e => e.Department).HasMaxLength(100);
+            entity.Property(e => e.Position).HasMaxLength(100);
+            entity.Property(e => e.Email).HasMaxLength(200);
+            entity.Property(e => e.Phone).HasMaxLength(50);
         });
     }
 }

@@ -8,6 +8,9 @@ export default function Layout() {
       <main className="main-content">
         <Outlet />
       </main>
+      <footer className="footer">
+        Sistema de Inventario de Equipos Tecnológicos &copy; {new Date().getFullYear()}
+      </footer>
     </div>
   );
 }

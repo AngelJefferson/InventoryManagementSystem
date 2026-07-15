@@ -21,38 +21,38 @@ export default function Login() {
       loginUser(res.data.token, { username: res.data.username, role: res.data.role });
       navigate('/');
     } catch (err) {
-      setError(err.response?.data?.error || 'Invalid credentials');
+      setError(err.response?.data?.error || 'Credenciales inválidas');
     }
   };
 
   return (
     <div className="login-page">
       <form className="login-form" onSubmit={handleSubmit}>
-        <h1>Inventory Management</h1>
-        <p className="login-subtitle">{isRegister ? 'Create account' : 'Sign in to continue'}</p>
+        <h1>InventarioCAID</h1>
+        <p className="login-subtitle">{isRegister ? 'Crear cuenta' : 'Iniciar sesión'}</p>
         {error && <div className="alert alert-error">{error}</div>}
         <div className="form-group">
-          <label>Username</label>
+          <label>Usuario</label>
           <input value={username} onChange={(e) => setUsername(e.target.value)} required />
         </div>
         {isRegister && (
           <div className="form-group">
-            <label>Email</label>
+            <label>Correo electrónico</label>
             <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
           </div>
         )}
         <div className="form-group">
-          <label>Password</label>
+          <label>Contraseña</label>
           <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
         </div>
         <button type="submit" className="btn btn-primary btn-block">
-          {isRegister ? 'Register' : 'Sign In'}
+          {isRegister ? 'Registrarse' : 'Iniciar Sesión'}
         </button>
         <p className="login-hint">
           {isRegister ? (
-            <>Already have an account? <a href="#" onClick={(e) => { e.preventDefault(); setIsRegister(false); setError(''); }}>Sign in</a></>
+            <>¿Ya tienes cuenta? <a href="#" onClick={(e) => { e.preventDefault(); setIsRegister(false); setError(''); }}>Inicia sesión</a></>
           ) : (
-            <>Don't have an account? <a href="#" onClick={(e) => { e.preventDefault(); setIsRegister(true); setError(''); }}>Register</a></>
+            <>¿No tienes cuenta? <a href="#" onClick={(e) => { e.preventDefault(); setIsRegister(true); setError(''); }}>Regístrate</a></>
           )}
         </p>
         {!isRegister && <p className="login-hint" style={{ marginTop: 4 }}>Demo: admin / admin123</p>}

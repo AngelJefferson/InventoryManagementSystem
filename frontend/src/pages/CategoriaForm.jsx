@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { getCategory, createCategory, updateCategory } from '../api/categoryService';
 
-export default function CategoryForm() {
+export default function CategoriaForm() {
   const { id } = useParams();
   const navigate = useNavigate();
   const isEdit = Boolean(id);
@@ -18,28 +18,28 @@ export default function CategoryForm() {
     try {
       if (isEdit) await updateCategory(id, form);
       else await createCategory(form);
-      navigate('/categories');
+      navigate('/categorias');
     } catch (err) {
-      setError(err.response?.data?.title || 'Error saving category');
+      setError(err.response?.data?.title || 'Error al guardar la categoría');
     }
   };
 
   return (
     <div className="form-page">
-      <h1>{isEdit ? 'Edit Category' : 'New Category'}</h1>
+      <h1>{isEdit ? 'Editar Categoría' : 'Nueva Categoría'}</h1>
       <form onSubmit={handleSubmit}>
         {error && <div className="alert alert-error">{error}</div>}
         <div className="form-group">
-          <label>Name</label>
+          <label>Nombre</label>
           <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
         </div>
         <div className="form-group">
-          <label>Description</label>
+          <label>Descripción</label>
           <textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
         </div>
         <div className="form-actions">
-          <button type="submit" className="btn btn-primary">{isEdit ? 'Update' : 'Create'}</button>
-          <button type="button" onClick={() => navigate('/categories')} className="btn">Cancel</button>
+          <button type="submit" className="btn btn-primary">{isEdit ? 'Actualizar' : 'Crear'}</button>
+          <button type="button" onClick={() => navigate('/categorias')} className="btn">Cancelar</button>
         </div>
       </form>
     </div>

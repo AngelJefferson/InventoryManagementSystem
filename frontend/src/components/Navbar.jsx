@@ -13,17 +13,18 @@ export default function Navbar() {
   return (
     <nav className="navbar">
       <div className="nav-brand">
-        <NavLink to="/">InventoryMS</NavLink>
+        <NavLink to="/">InventarioCAID</NavLink>
       </div>
       <div className="nav-links">
-        <NavLink to="/" end>Dashboard</NavLink>
-        <NavLink to="/categories">Categories</NavLink>
-        <NavLink to="/products">Products</NavLink>
-        <NavLink to="/suppliers">Suppliers</NavLink>
+        <NavLink to="/" end>Inicio</NavLink>
+        <NavLink to="/equipos">Equipos</NavLink>
+        <NavLink to="/categorias">Categorías</NavLink>
+        <NavLink to="/proveedores">Proveedores</NavLink>
+        <NavLink to="/empleados">Empleados</NavLink>
       </div>
       <div className="nav-user">
         <span>{user?.username} ({user?.role})</span>
-        <button onClick={handleLogout} className="btn-link">Logout</button>
+        <button onClick={handleLogout} className="btn-link">Cerrar Sesión</button>
       </div>
     </nav>
   );

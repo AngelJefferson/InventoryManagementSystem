@@ -1,17 +1,19 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
-import './App.css';
 import Layout from './components/Layout';
 import ProtectedRoute from './components/ProtectedRoute';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
-import Categories from './pages/Categories';
-import CategoryForm from './pages/CategoryForm';
-import Products from './pages/Products';
-import ProductForm from './pages/ProductForm';
-import Suppliers from './pages/Suppliers';
-import SupplierForm from './pages/SupplierForm';
-import Inventory from './pages/Inventory';
-import Movements from './pages/Movements';
+import Equipos from './pages/Equipos';
+import EquipoForm from './pages/EquipoForm';
+import Categorias from './pages/Categorias';
+import CategoriaForm from './pages/CategoriaForm';
+import Proveedores from './pages/Proveedores';
+import ProveedorForm from './pages/ProveedorForm';
+import Inventario from './pages/Inventario';
+import Movimientos from './pages/Movimientos';
+import Empleados from './pages/Empleados';
+import EmpleadoForm from './pages/EmpleadoForm';
+import './App.css';
 
 export default function App() {
   return (
@@ -19,17 +21,20 @@ export default function App() {
       <Route path="/login" element={<Login />} />
       <Route path="/" element={<ProtectedRoute><Layout /></ProtectedRoute>}>
         <Route index element={<Dashboard />} />
-        <Route path="categories" element={<Categories />} />
-        <Route path="categories/new" element={<CategoryForm />} />
-        <Route path="categories/:id/edit" element={<CategoryForm />} />
-        <Route path="products" element={<Products />} />
-        <Route path="products/new" element={<ProductForm />} />
-        <Route path="products/:id/edit" element={<ProductForm />} />
-        <Route path="products/:id/inventory" element={<Inventory />} />
-        <Route path="products/:id/movements" element={<Movements />} />
-        <Route path="suppliers" element={<Suppliers />} />
-        <Route path="suppliers/new" element={<SupplierForm />} />
-        <Route path="suppliers/:id/edit" element={<SupplierForm />} />
+        <Route path="equipos" element={<Equipos />} />
+        <Route path="equipos/nuevo" element={<EquipoForm />} />
+        <Route path="equipos/:id/editar" element={<EquipoForm />} />
+        <Route path="equipos/:id/inventario" element={<Inventario />} />
+        <Route path="equipos/:id/movimientos" element={<Movimientos />} />
+        <Route path="categorias" element={<Categorias />} />
+        <Route path="categorias/nueva" element={<CategoriaForm />} />
+        <Route path="categorias/:id/editar" element={<CategoriaForm />} />
+        <Route path="proveedores" element={<Proveedores />} />
+        <Route path="proveedores/nuevo" element={<ProveedorForm />} />
+        <Route path="proveedores/:id/editar" element={<ProveedorForm />} />
+        <Route path="empleados" element={<Empleados />} />
+        <Route path="empleados/nuevo" element={<EmpleadoForm />} />
+        <Route path="empleados/:id/editar" element={<EmpleadoForm />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
