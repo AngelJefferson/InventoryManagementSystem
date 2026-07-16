@@ -63,12 +63,12 @@ export default function Equipos() {
       'Marca': p.categoryName,
       'Modelo': p.model || '—',
       'Nº de Serie': p.sku,
-      'Número de Activo': p.assetNumber || '',
+      'Numero de Activo': p.assetNumber || '',
       'Usuario Asignado': p.employeeName || '—',
       'Departamento': p.department || '',
       'Ubicación Física': p.physicalLocation || '',
       'Sistema Operativo': p.operatingSystem || '',
-      'Configuración Hardware': p.hardwareConfiguration || '',
+      'Configuracion Hardware': p.hardwareConfiguration || '',
       'Estado': p.status || '',
       'Fecha de Adquisición': p.acquisitionDate ? new Date(p.acquisitionDate).toLocaleDateString() : '',
       'Observaciones': p.observations || '',
@@ -161,7 +161,7 @@ export default function Equipos() {
         <h1>Equipos</h1>
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
           <button className="btn btn-accent" onClick={exportExcel}>📥 Exportar</button>
-          <button className="btn btn-primary" onClick={() => { setShowImport(true); setImportMsg(''); setImportData(null); }}>📂 Cargar Excel</button>
+          <button className="btn btn-primary" onClick={() => { setShowImport(true); setImportMsg(''); setImportData(null); }}>📂 Subir Documentos</button>
           <Link to="/equipos/nuevo" className="btn btn-success">+ Nuevo Equipo</Link>
         </div>
       </div>
@@ -213,9 +213,9 @@ export default function Equipos() {
       {showImport && (
         <div className="modal-overlay" onClick={() => setShowImport(false)}>
           <div className="modal" onClick={(e) => e.stopPropagation()}>
-            <h2>Cargar Equipos desde Excel</h2>
+            <h2>Importar Equipos</h2>
             <p className="text-muted" style={{ marginBottom: 12, fontSize: '0.85rem' }}>
-              Columnas esperadas: Tipo de Equipo, Marca, Modelo, Nº de Serie, Numero de Activo, Usuario Asignado, Departamento, Ubicación Física, Sistema Operativo, Configuracion Hardware, Estado, Fecha de Adquisición, Observaciones, Fecha Mantenimiento
+              Selecciona un archivo Excel (.xlsx) con los datos de los equipos.
             </p>
             <input type="file" accept=".xlsx,.xls" onChange={handleImportFile} style={{ marginBottom: 12 }} />
             {importMsg && <div className={`alert ${importMsg.includes('Error') ? 'alert-error' : 'alert-success'}`}>{importMsg}</div>}
