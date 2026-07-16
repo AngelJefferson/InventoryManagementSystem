@@ -2,6 +2,7 @@ using System.Net;
 using System.Text.Json;
 using FluentValidation;
 using InventoryManagement.Domain.Exceptions;
+using Microsoft.EntityFrameworkCore;
 
 namespace InventoryManagement.API.Middleware;
 
@@ -31,34 +32,40 @@ public class ExceptionHandlingMiddleware
     private async Task HandleExceptionAsync(HttpContext context, Exception exception)
     {
         var code = HttpStatusCode.InternalServerError;
-        var message = "An internal server error occurred.";
+        var message = exception.Message;
 
         switch (exception)
         {
             case InsufficientStockException:
                 code = HttpStatusCode.Conflict;
-                message = exception.Message;
                 break;
             case ValidationException:
                 code = HttpStatusCode.BadRequest;
-                message = exception.Message;
                 break;
             case KeyNotFoundException:
                 code = HttpStatusCode.NotFound;
-                message = exception.Message;
                 break;
             case InvalidOperationException:
                 code = HttpStatusCode.BadRequest;
-                message = exception.Message;
                 break;
             case ArgumentException:
                 code = HttpStatusCode.BadRequest;
-                message = exception.Message;
+                break;
+            case DbUpdateException:
+                code = HttpStatusCode.Conflict;
+                message = "Error de base de datos: " + exception.InnerException?.Message ?? exception.Message;
+                break;
+            default:
+                message = $"Error interno ({exception.GetType().Name}): {exception.Message}";
                 break;
         }
 
-        _logger.LogError(exception, "HTTP {Method} {Path} returned {StatusCode}",
-            context.Request.Method, context.Request.Path, (int)code);
+        if (code == HttpStatusCode.InternalServerError)
+            _logger.LogError(exception, "HTTP {Method} {Path} devolvió {StatusCode}: {Message}",
+                context.Request.Method, context.Request.Path, (int)code, exception.Message);
+        else
+            _logger.LogWarning(exception, "HTTP {Method} {Path} devolvió {StatusCode}: {Message}",
+                context.Request.Method, context.Request.Path, (int)code, exception.Message);
 
         context.Response.ContentType = "application/json";
         context.Response.StatusCode = (int)code;
