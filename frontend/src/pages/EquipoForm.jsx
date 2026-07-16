@@ -79,7 +79,7 @@ export default function EquipoForm() {
   );
 
   const selectEmployee = (emp) => {
-    setForm({ ...form, employeeId: emp.id, department: emp.department || '' });
+    setForm({ ...form, employeeId: emp.id, department: emp.department || '', physicalLocation: emp.sede || '' });
     setEmpSearch(emp.fullName);
     setEmpOpen(false);
   };
@@ -229,7 +229,7 @@ export default function EquipoForm() {
                   style={{ padding: '8px 12px', cursor: 'pointer', fontSize: '0.9rem', borderBottom: '1px solid var(--border)' }}
                   onMouseEnter={(e) => e.target.style.background = 'var(--bg)'}
                   onMouseLeave={(e) => e.target.style.background = 'transparent'}>
-                  {e.fullName} {e.department ? `(${e.department})` : ''}
+                  {e.fullName} {e.sede ? `[${e.sede}]` : ''} {e.department ? `(${e.department})` : ''}
                 </div>
               ))}
             </div>

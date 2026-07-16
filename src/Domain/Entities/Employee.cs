@@ -5,6 +5,7 @@ public class Employee
     public Guid Id { get; private set; }
     public string FullName { get; private set; } = null!;
     public string Department { get; private set; } = string.Empty;
+    public string Sede { get; private set; } = string.Empty;
     public string Position { get; private set; } = string.Empty;
     public string Email { get; private set; } = string.Empty;
     public bool IsActive { get; private set; }
@@ -14,11 +15,12 @@ public class Employee
 
     private Employee() { }
 
-    public Employee(string fullName, string department, string position, string email)
+    public Employee(string fullName, string department, string sede, string position, string email)
     {
         Id = Guid.NewGuid();
         SetFullName(fullName);
         SetDepartment(department);
+        SetSede(sede);
         SetPosition(position);
         SetEmail(email);
         IsActive = true;
@@ -35,6 +37,12 @@ public class Employee
     public void SetDepartment(string department)
     {
         Department = department ?? string.Empty;
+        UpdatedAt = DateTime.UtcNow;
+    }
+
+    public void SetSede(string sede)
+    {
+        Sede = sede ?? string.Empty;
         UpdatedAt = DateTime.UtcNow;
     }
 

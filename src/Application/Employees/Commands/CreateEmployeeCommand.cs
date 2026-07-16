@@ -6,7 +6,7 @@ using MediatR;
 
 namespace InventoryManagement.Application.Employees.Commands;
 
-public record CreateEmployeeCommand(string FullName, string Department, string Position, string Email) : IRequest<EmployeeDto>;
+public record CreateEmployeeCommand(string FullName, string Department, string Sede, string Position, string Email) : IRequest<EmployeeDto>;
 
 public class CreateEmployeeCommandHandler : IRequestHandler<CreateEmployeeCommand, EmployeeDto>
 {
@@ -19,7 +19,7 @@ public class CreateEmployeeCommandHandler : IRequestHandler<CreateEmployeeComman
 
     public async Task<EmployeeDto> Handle(CreateEmployeeCommand request, CancellationToken cancellationToken)
     {
-        var employee = new Employee(request.FullName, request.Department, request.Position, request.Email);
+        var employee = new Employee(request.FullName, request.Department, request.Sede, request.Position, request.Email);
 
         _context.Employees.Add(employee);
         await _context.SaveChangesAsync(cancellationToken);
@@ -29,6 +29,7 @@ public class CreateEmployeeCommandHandler : IRequestHandler<CreateEmployeeComman
             Id = employee.Id,
             FullName = employee.FullName,
             Department = employee.Department,
+            Sede = employee.Sede,
             Position = employee.Position,
             Email = employee.Email,
             IsActive = employee.IsActive,
@@ -46,6 +47,7 @@ public class CreateEmployeeCommandValidator : AbstractValidator<CreateEmployeeCo
             .MaximumLength(200).WithMessage("El nombre no debe exceder 200 caracteres.");
 
         RuleFor(v => v.Department).MaximumLength(100);
+        RuleFor(v => v.Sede).MaximumLength(100);
         RuleFor(v => v.Position).MaximumLength(100);
         RuleFor(v => v.Email).MaximumLength(200);
     }

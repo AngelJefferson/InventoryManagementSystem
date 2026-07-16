@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace InventoryManagement.Application.Employees.Commands;
 
-public record UpdateEmployeeCommand(Guid Id, string FullName, string Department, string Position, string Email) : IRequest<EmployeeDto>;
+public record UpdateEmployeeCommand(Guid Id, string FullName, string Department, string Sede, string Position, string Email) : IRequest<EmployeeDto>;
 
 public class UpdateEmployeeCommandHandler : IRequestHandler<UpdateEmployeeCommand, EmployeeDto>
 {
@@ -25,6 +25,7 @@ public class UpdateEmployeeCommandHandler : IRequestHandler<UpdateEmployeeComman
 
         employee.SetFullName(request.FullName);
         employee.SetDepartment(request.Department);
+        employee.SetSede(request.Sede);
         employee.SetPosition(request.Position);
         employee.SetEmail(request.Email);
 
@@ -35,6 +36,7 @@ public class UpdateEmployeeCommandHandler : IRequestHandler<UpdateEmployeeComman
             Id = employee.Id,
             FullName = employee.FullName,
             Department = employee.Department,
+            Sede = employee.Sede,
             Position = employee.Position,
             Email = employee.Email,
             IsActive = employee.IsActive,
@@ -52,6 +54,7 @@ public class UpdateEmployeeCommandValidator : AbstractValidator<UpdateEmployeeCo
             .NotEmpty().WithMessage("El nombre completo es obligatorio.")
             .MaximumLength(200);
         RuleFor(v => v.Department).MaximumLength(100);
+        RuleFor(v => v.Sede).MaximumLength(100);
         RuleFor(v => v.Position).MaximumLength(100);
         RuleFor(v => v.Email).MaximumLength(200);
     }

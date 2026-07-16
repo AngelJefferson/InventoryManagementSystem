@@ -100,6 +100,7 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext
             entity.HasKey(e => e.Id);
             entity.Property(e => e.FullName).HasMaxLength(200).IsRequired();
             entity.Property(e => e.Department).HasMaxLength(100);
+            entity.Property(e => e.Sede).HasMaxLength(100);
             entity.Property(e => e.Position).HasMaxLength(100);
             entity.Property(e => e.Email).HasMaxLength(200);
             entity.HasMany(e => e.Products)

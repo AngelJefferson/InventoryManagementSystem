@@ -7,7 +7,7 @@ export default function EmpleadoForm() {
   const navigate = useNavigate();
   const isEdit = Boolean(id);
   const [form, setForm] = useState({
-    fullName: '', department: '', position: '', email: '',
+    fullName: '', department: '', sede: '', position: '', email: '',
   });
   const [error, setError] = useState('');
 
@@ -16,7 +16,7 @@ export default function EmpleadoForm() {
       const e = r.data;
       setForm({
         fullName: e.fullName, department: e.department || '',
-        position: e.position || '', email: e.email || '',
+        sede: e.sede || '', position: e.position || '', email: e.email || '',
       });
     });
   }, [id]);
@@ -24,8 +24,9 @@ export default function EmpleadoForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      if (isEdit) await updateEmployee(id, { id, ...form });
-      else await createEmployee(form);
+      const payload = { ...form, id };
+      if (isEdit) await updateEmployee(id, payload);
+      else await createEmployee(payload);
       navigate('/empleados');
     } catch (err) {
       const data = err.response?.data; setError(data?.title || data?.error || data?.detail || 'Error al guardar el empleado');
@@ -44,18 +45,22 @@ export default function EmpleadoForm() {
           </div>
           <div className="form-group">
             <label>Departamento</label>
-            <input value={form.department} onChange={(e) => setForm({ ...form, department: e.target.value })} />
+            <input value={form.department} onChange={(e) => setForm({ ...form, department: e.target.value })} placeholder="Ej: TI, Contabilidad" />
           </div>
         </div>
         <div className="form-row">
           <div className="form-group">
+            <label>Sede</label>
+            <input value={form.sede} onChange={(e) => setForm({ ...form, sede: e.target.value })} placeholder="Ej: Edificio A, Piso 2" />
+          </div>
+          <div className="form-group">
             <label>Puesto</label>
             <input value={form.position} onChange={(e) => setForm({ ...form, position: e.target.value })} />
           </div>
-          <div className="form-group">
-            <label>Correo electrónico</label>
-            <input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
-          </div>
+        </div>
+        <div className="form-group">
+          <label>Correo electrónico</label>
+          <input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
         </div>
         <div className="form-actions">
           <button type="submit" className="btn btn-primary">{isEdit ? 'Actualizar' : 'Crear'}</button>
