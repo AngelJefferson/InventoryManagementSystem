@@ -42,6 +42,7 @@ export default function EquipoForm() {
     hardwareConfiguration: '', status: '', acquisitionDate: '', observations: '', maintenanceDate: '',
   });
   const [error, setError] = useState('');
+  const fcls = (v) => v ? 'input-filled' : '';
   const [showScanner, setShowScanner] = useState(false);
   const [ocrText, setOcrText] = useState('');
   const [empSearch, setEmpSearch] = useState('');
@@ -172,12 +173,12 @@ export default function EquipoForm() {
 
         <div className="form-row">
           <div className="form-group">
-            <label>Tipo de Equipo</label>
-            <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required placeholder="Ej: Laptop, Monitor, Impresora" />
+            <label>Tipo de Equipo <span className="required">*</span></label>
+            <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required placeholder="Ej: Laptop, Monitor, Impresora" className={fcls(form.name)} />
           </div>
           <div className="form-group">
-            <label>Marca</label>
-            <select value={form.categoryId} onChange={(e) => setForm({ ...form, categoryId: e.target.value })} required>
+            <label>Marca <span className="required">*</span></label>
+            <select value={form.categoryId} onChange={(e) => setForm({ ...form, categoryId: e.target.value })} required className={fcls(form.categoryId)}>
               <option value="">Seleccionar marca</option>
               {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
             </select>
@@ -186,22 +187,22 @@ export default function EquipoForm() {
 
         <div className="form-row">
           <div className="form-group">
-            <label>Modelo</label>
-            <input value={form.model} onChange={(e) => setForm({ ...form, model: e.target.value })} placeholder="Se llena con OCR" />
+            <label>Modelo <span className="required">*</span></label>
+            <input value={form.model} onChange={(e) => setForm({ ...form, model: e.target.value })} required placeholder="Se llena con OCR" className={fcls(form.model)} />
           </div>
           <div className="form-group">
-            <label>Nº de Serie</label>
-            <input value={form.sku} onChange={(e) => setForm({ ...form, sku: e.target.value })} required placeholder="Se llena con OCR" />
+            <label>Nº de Serie <span className="required">*</span></label>
+            <input value={form.sku} onChange={(e) => setForm({ ...form, sku: e.target.value })} required placeholder="Se llena con OCR" className={fcls(form.sku)} />
           </div>
         </div>
 
         <div className="form-group">
           <label>Número de Activo</label>
-          <input value={form.assetNumber} onChange={(e) => setForm({ ...form, assetNumber: e.target.value })} placeholder="Opcional" />
+          <input value={form.assetNumber} onChange={(e) => setForm({ ...form, assetNumber: e.target.value })} placeholder="Opcional" className={fcls(form.assetNumber)} />
         </div>
 
         <div className="form-group" ref={empRef} style={{ position: 'relative' }}>
-          <label>Usuario Asignado</label>
+          <label>Usuario Asignado <span className="required">*</span></label>
           <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 8 }}>
             {CONSULTORIOS.map((c) => (
               <button key={c} type="button" className={`btn btn-sm ${empSearch === c && !form.employeeId ? 'btn-primary' : ''}`}
@@ -214,7 +215,7 @@ export default function EquipoForm() {
             value={empSearch}
             onChange={(e) => { setEmpSearch(e.target.value); setEmpOpen(true); setForm({ ...form, employeeId: '' }); }}
             onFocus={() => setEmpOpen(true)}
-            placeholder="Escribe para buscar empleado..."
+            placeholder="Escribe para buscar empleado..." className={fcls(empSearch)}
           />
           {empOpen && (
             <div style={{
@@ -238,30 +239,30 @@ export default function EquipoForm() {
 
         <div className="form-row">
           <div className="form-group">
-            <label>Departamento</label>
-            <input value={form.department} onChange={(e) => setForm({ ...form, department: e.target.value })} placeholder="Ej: TI, Contabilidad" />
+            <label>Departamento <span className="required">*</span></label>
+            <input value={form.department} onChange={(e) => setForm({ ...form, department: e.target.value })} required placeholder="Ej: TI, Contabilidad" className={fcls(form.department)} />
           </div>
           <div className="form-group">
-            <label>Ubicación Física</label>
-            <input value={form.physicalLocation} onChange={(e) => setForm({ ...form, physicalLocation: e.target.value })} placeholder="Ej: Edificio A, Piso 2" />
+            <label>Ubicación Física <span className="required">*</span></label>
+            <input value={form.physicalLocation} onChange={(e) => setForm({ ...form, physicalLocation: e.target.value })} required placeholder="Ej: Edificio A, Piso 2" className={fcls(form.physicalLocation)} />
           </div>
         </div>
 
         <div className="form-row">
           <div className="form-group">
             <label>Sistema Operativo</label>
-            <input value={form.operatingSystem} onChange={(e) => setForm({ ...form, operatingSystem: e.target.value })} placeholder="N/A si no aplica" />
+            <input value={form.operatingSystem} onChange={(e) => setForm({ ...form, operatingSystem: e.target.value })} placeholder="N/A si no aplica" className={fcls(form.operatingSystem)} />
           </div>
           <div className="form-group">
             <label>Configuración Hardware</label>
-            <input value={form.hardwareConfiguration} onChange={(e) => setForm({ ...form, hardwareConfiguration: e.target.value })} placeholder="Ej: 8GB RAM, 256GB SSD" />
+            <input value={form.hardwareConfiguration} onChange={(e) => setForm({ ...form, hardwareConfiguration: e.target.value })} placeholder="Ej: 8GB RAM, 256GB SSD" className={fcls(form.hardwareConfiguration)} />
           </div>
         </div>
 
         <div className="form-row">
           <div className="form-group">
             <label>Estado</label>
-            <select value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value })}>
+            <select value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value })} className={fcls(form.status)}>
               <option value="">Seleccionar</option>
               <option value="Operativo">Operativo</option>
               <option value="Dañado">Dañado</option>
@@ -276,7 +277,7 @@ export default function EquipoForm() {
 
         <div className="form-group">
           <label>Observaciones</label>
-          <textarea value={form.observations} onChange={(e) => setForm({ ...form, observations: e.target.value })} placeholder="Opcional" />
+            <textarea value={form.observations} onChange={(e) => setForm({ ...form, observations: e.target.value })} placeholder="Opcional" className={fcls(form.observations)} />
         </div>
 
         <div className="form-group">
@@ -286,7 +287,7 @@ export default function EquipoForm() {
 
         <div className="form-group">
           <label>Proveedor (opcional)</label>
-          <select value={form.supplierId} onChange={(e) => setForm({ ...form, supplierId: e.target.value })}>
+            <select value={form.supplierId} onChange={(e) => setForm({ ...form, supplierId: e.target.value })} className={fcls(form.supplierId)}>
             <option value="">Sin proveedor</option>
             {suppliers.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
           </select>

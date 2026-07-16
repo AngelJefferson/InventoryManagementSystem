@@ -1,16 +1,49 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { getProducts, deleteProduct } from '../api/productService';
+import { getProducts, deleteProduct, bulkCreateProducts } from '../api/productService';
+import { getCategories } from '../api/categoryService';
+import { getEmployees } from '../api/employeeService';
 import * as XLSX from 'xlsx';
+
+const COL_MAP = {
+  'Tipo de Equipo': 'name',
+  'Marca': 'categoryName',
+  'Modelo': 'model',
+  'Nº de Serie': 'sku',
+  'Numero de Activo': 'assetNumber',
+  'Número de Activo': 'assetNumber',
+  'Usuario Asignado': 'employeeName',
+  'Departamento': 'department',
+  'Ubicación Física': 'physicalLocation',
+  'Sistema Operativo': 'operatingSystem',
+  'Configuracion Hardware': 'hardwareConfiguration',
+  'Configuración Hardware': 'hardwareConfiguration',
+  'Estado': 'status',
+  'Fecha de Adquisición': 'acquisitionDate',
+  'Observaciones': 'observations',
+  'Fecha Mantenimiento': 'maintenanceDate',
+};
 
 export default function Equipos() {
   const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
+  const [filterDept, setFilterDept] = useState('');
+  const [filterUbic, setFilterUbic] = useState('');
+  const [showImport, setShowImport] = useState(false);
+  const [importData, setImportData] = useState(null);
+  const [importing, setImporting] = useState(false);
+  const [importMsg, setImportMsg] = useState('');
 
   const load = () => {
     setLoading(true);
-    getProducts().then((r) => setProducts(r.data)).finally(() => setLoading(false));
+    Promise.all([
+      getProducts().then((r) => setProducts(r.data)),
+      getCategories().then((r) => setCategories(r.data)),
+      getEmployees().then((r) => setEmployees(r.data)),
+    ]).finally(() => setLoading(false));
   };
 
   useEffect(load, []);
@@ -28,7 +61,7 @@ export default function Equipos() {
       'Modelo': p.model || '—',
       'Nº de Serie': p.sku,
       'Número de Activo': p.assetNumber || '',
-      'Usuario Asignado': p.employeeName || p.department || '—',
+      'Usuario Asignado': p.employeeName || '—',
       'Departamento': p.department || '',
       'Ubicación Física': p.physicalLocation || '',
       'Sistema Operativo': p.operatingSystem || '',
@@ -45,12 +78,73 @@ export default function Equipos() {
     XLSX.writeFile(wb, 'InventarioCAID_Equipos.xlsx');
   };
 
-  const filtered = products.filter((p) =>
-    p.name.toLowerCase().includes(search.toLowerCase()) ||
-    (p.model || '').toLowerCase().includes(search.toLowerCase()) ||
-    p.sku.toLowerCase().includes(search.toLowerCase()) ||
-    (p.assetNumber || '').toLowerCase().includes(search.toLowerCase())
-  );
+  const handleImportFile = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const wb = XLSX.read(ev.target.result, { type: 'array' });
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      const rows = XLSX.utils.sheet_to_json(ws, { defval: '' });
+      setImportData(rows);
+      setImportMsg(`Se encontraron ${rows.length} registros.`);
+    };
+    reader.readAsArrayBuffer(file);
+    e.target.value = '';
+  };
+
+  const doImport = async () => {
+    if (!importData || importData.length === 0) return;
+    setImporting(true);
+    setImportMsg('');
+    try {
+      const items = importData.map((row) => {
+        const mapped = {};
+        for (const [col, field] of Object.entries(COL_MAP)) {
+          mapped[field] = row[col] !== undefined ? String(row[col]).trim() : '';
+        }
+        return {
+          name: mapped.name || '',
+          categoryName: mapped.categoryName || '',
+          model: mapped.model || '',
+          sku: mapped.sku || '',
+          assetNumber: mapped.assetNumber || null,
+          employeeName: mapped.employeeName || null,
+          department: mapped.department || '',
+          physicalLocation: mapped.physicalLocation || '',
+          operatingSystem: mapped.operatingSystem || '',
+          hardwareConfiguration: mapped.hardwareConfiguration || '',
+          status: mapped.status || '',
+          acquisitionDate: mapped.acquisitionDate ? new Date(mapped.acquisitionDate).toISOString() : null,
+          observations: mapped.observations || '',
+          maintenanceDate: mapped.maintenanceDate ? new Date(mapped.maintenanceDate).toISOString() : null,
+        };
+      });
+      const res = await bulkCreateProducts({ products: items });
+      setImportMsg(`¡${res.data.created} equipos importados correctamente!`);
+      setImportData(null);
+      load();
+    } catch (err) {
+      const data = err.response?.data;
+      setImportMsg(data?.error || data?.title || 'Error al importar');
+    } finally {
+      setImporting(false);
+    }
+  };
+
+  const depts = [...new Set(products.map((p) => p.department).filter(Boolean))].sort();
+  const ubics = [...new Set(products.map((p) => p.physicalLocation).filter(Boolean))].sort();
+
+  const filtered = products.filter((p) => {
+    if (search && !p.name.toLowerCase().includes(search.toLowerCase()) &&
+      !(p.model || '').toLowerCase().includes(search.toLowerCase()) &&
+      !p.sku.toLowerCase().includes(search.toLowerCase()) &&
+      !(p.assetNumber || '').toLowerCase().includes(search.toLowerCase()))
+      return false;
+    if (filterDept && p.department !== filterDept) return false;
+    if (filterUbic && p.physicalLocation !== filterUbic) return false;
+    return true;
+  });
 
   if (loading) return <div className="loading">Cargando...</div>;
 
@@ -58,14 +152,23 @@ export default function Equipos() {
     <div>
       <div className="page-header">
         <h1>Equipos</h1>
-        <div style={{ display: 'flex', gap: 8 }}>
-          <button className="btn btn-accent" onClick={exportExcel}>📥 Exportar Excel</button>
-          <Link to="/equipos/nuevo" className="btn btn-primary">+ Nuevo Equipo</Link>
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+          <button className="btn btn-accent" onClick={exportExcel}>📥 Exportar</button>
+          <button className="btn btn-primary" onClick={() => { setShowImport(true); setImportMsg(''); setImportData(null); }}>📂 Cargar Excel</button>
+          <Link to="/equipos/nuevo" className="btn">+ Nuevo Equipo</Link>
         </div>
       </div>
       <div className="search-bar">
         <input placeholder="Buscar equipo por nombre, modelo, Nº de Serie o activo..." value={search}
           onChange={(e) => setSearch(e.target.value)} />
+        <select value={filterDept} onChange={(e) => setFilterDept(e.target.value)}>
+          <option value="">Todos los deptos</option>
+          {depts.map((d) => <option key={d} value={d}>{d}</option>)}
+        </select>
+        <select value={filterUbic} onChange={(e) => setFilterUbic(e.target.value)}>
+          <option value="">Todas las ubicaciones</option>
+          {ubics.map((u) => <option key={u} value={u}>{u}</option>)}
+        </select>
       </div>
       <div className="table-container">
         <table className="table">
@@ -92,7 +195,7 @@ export default function Equipos() {
                 <td>{p.model || <span className="text-muted">—</span>}</td>
                 <td><code>{p.sku}</code></td>
                 <td>{p.assetNumber || <span className="text-muted">—</span>}</td>
-                <td>{p.employeeName || p.department || <span className="text-muted">—</span>}</td>
+                <td>{p.employeeName || <span className="text-muted">—</span>}</td>
                 <td>{p.department || <span className="text-muted">—</span>}</td>
                 <td>{p.physicalLocation || <span className="text-muted">—</span>}</td>
                 <td>{p.status || <span className="text-muted">—</span>}</td>
@@ -109,6 +212,59 @@ export default function Equipos() {
           </tbody>
         </table>
       </div>
+
+      {showImport && (
+        <div className="modal-overlay" onClick={() => setShowImport(false)}>
+          <div className="modal" onClick={(e) => e.stopPropagation()}>
+            <h2>Cargar Equipos desde Excel</h2>
+            <p className="text-muted" style={{ marginBottom: 12, fontSize: '0.85rem' }}>
+              Columnas esperadas: Tipo de Equipo, Marca, Modelo, Nº de Serie, Numero de Activo, Usuario Asignado, Departamento, Ubicación Física, Sistema Operativo, Configuracion Hardware, Estado, Fecha de Adquisición, Observaciones, Fecha Mantenimiento
+            </p>
+            <input type="file" accept=".xlsx,.xls" onChange={handleImportFile} style={{ marginBottom: 12 }} />
+            {importMsg && <div className={`alert ${importMsg.includes('Error') ? 'alert-error' : 'alert-success'}`}>{importMsg}</div>}
+            {importData && importData.length > 0 && (
+              <div style={{ maxHeight: 200, overflow: 'auto', marginBottom: 12, fontSize: '0.85rem' }}>
+                <strong>Vista previa ({importData.length} registros):</strong>
+                <table className="table" style={{ fontSize: '0.78rem' }}>
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>Equipo</th>
+                      <th>Marca</th>
+                      <th>Modelo</th>
+                      <th>Serie</th>
+                      <th>Asignado</th>
+                      <th>Depto</th>
+                      <th>Ubicación</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {importData.slice(0, 10).map((row, i) => (
+                      <tr key={i}>
+                        <td>{i + 1}</td>
+                        <td>{row['Tipo de Equipo']}</td>
+                        <td>{row['Marca']}</td>
+                        <td>{row['Modelo']}</td>
+                        <td>{row['Nº de Serie']}</td>
+                        <td>{row['Usuario Asignado']}</td>
+                        <td>{row['Departamento']}</td>
+                        <td>{row['Ubicación Física']}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                {importData.length > 10 && <p className="text-muted">... y {importData.length - 10} más</p>}
+              </div>
+            )}
+            <div className="form-actions">
+              <button className="btn btn-primary" onClick={doImport} disabled={!importData || importing}>
+                {importing ? 'Importando...' : 'Importar'}
+              </button>
+              <button className="btn" onClick={() => setShowImport(false)}>Cerrar</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

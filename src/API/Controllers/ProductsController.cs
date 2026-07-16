@@ -51,6 +51,14 @@ public class ProductsController : ControllerBase
     }
 
     [Authorize(Roles = "Admin")]
+    [HttpPost("bulk")]
+    public async Task<IActionResult> BulkCreate([FromBody] BulkCreateProductsCommand command)
+    {
+        var count = await _mediator.Send(command);
+        return Ok(new { created = count });
+    }
+
+    [Authorize(Roles = "Admin")]
     [HttpDelete("{id:guid}")]
     public async Task<IActionResult> Delete(Guid id)
     {
