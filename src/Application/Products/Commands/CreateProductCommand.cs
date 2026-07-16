@@ -14,7 +14,16 @@ public record CreateProductCommand(
     string Model,
     Guid CategoryId,
     Guid? SupplierId,
-    Guid? EmployeeId
+    Guid? EmployeeId,
+    string? AssetNumber = null,
+    string Department = "",
+    string PhysicalLocation = "",
+    string OperatingSystem = "",
+    string HardwareConfiguration = "",
+    string Status = "",
+    DateTime? AcquisitionDate = null,
+    string Observations = "",
+    DateTime? MaintenanceDate = null
 ) : IRequest<ProductDto>;
 
 public class CreateProductCommandHandler : IRequestHandler<CreateProductCommand, ProductDto>
@@ -40,13 +49,11 @@ public class CreateProductCommandHandler : IRequestHandler<CreateProductCommand,
         }
 
         var product = new Product(
-            request.Name,
-            request.Description,
-            request.SKU,
-            request.CategoryId,
-            request.SupplierId,
-            request.Model,
-            request.EmployeeId
+            request.Name, request.Description, request.SKU, request.CategoryId,
+            request.SupplierId, request.Model, request.EmployeeId,
+            request.AssetNumber, request.Department, request.PhysicalLocation,
+            request.OperatingSystem, request.HardwareConfiguration,
+            request.Status, request.AcquisitionDate, request.Observations, request.MaintenanceDate
         );
 
         _context.Products.Add(product);
@@ -61,6 +68,15 @@ public class CreateProductCommandHandler : IRequestHandler<CreateProductCommand,
             Model = product.Model,
             CategoryId = product.CategoryId,
             SupplierId = product.SupplierId,
+            AssetNumber = product.AssetNumber,
+            Department = product.Department,
+            PhysicalLocation = product.PhysicalLocation,
+            OperatingSystem = product.OperatingSystem,
+            HardwareConfiguration = product.HardwareConfiguration,
+            Status = product.Status,
+            AcquisitionDate = product.AcquisitionDate,
+            Observations = product.Observations,
+            MaintenanceDate = product.MaintenanceDate,
             IsActive = product.IsActive,
             CreatedAt = product.CreatedAt
         };

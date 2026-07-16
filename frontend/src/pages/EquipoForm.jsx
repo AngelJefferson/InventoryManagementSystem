@@ -10,10 +10,8 @@ async function runOcr(imageSrc, setOcrText) {
     const Tesseract = await import('tesseract.js');
     const { data } = await Tesseract.recognize(imageSrc, 'spa');
     setOcrText(data.text);
-    return data.text;
   } catch (err) {
     alert('Error al procesar la imagen: ' + err.message);
-    return '';
   }
 }
 
@@ -29,6 +27,8 @@ function applyOcrText(ocrText, form, setForm) {
   if (Object.keys(updates).length) setForm({ ...form, ...updates });
 }
 
+const CONSULTORIOS = ['Consultorio 1', 'Consultorio 2', 'Consultorio 3', 'Consultorio 4'];
+
 export default function EquipoForm() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -38,6 +38,8 @@ export default function EquipoForm() {
   const [employees, setEmployees] = useState([]);
   const [form, setForm] = useState({
     name: '', sku: '', model: '', description: '', categoryId: '', supplierId: '', employeeId: '',
+    assetNumber: '', department: '', physicalLocation: '', operatingSystem: '',
+    hardwareConfiguration: '', status: '', acquisitionDate: '', observations: '', maintenanceDate: '',
   });
   const [error, setError] = useState('');
   const [showScanner, setShowScanner] = useState(false);
@@ -60,6 +62,11 @@ export default function EquipoForm() {
       setForm({
         name: p.name, sku: p.sku, model: p.model || '', description: p.description || '',
         categoryId: p.categoryId, supplierId: p.supplierId || '', employeeId: p.employeeId || '',
+        assetNumber: p.assetNumber || '', department: p.department || '',
+        physicalLocation: p.physicalLocation || '', operatingSystem: p.operatingSystem || '',
+        hardwareConfiguration: p.hardwareConfiguration || '', status: p.status || '',
+        acquisitionDate: p.acquisitionDate ? p.acquisitionDate.slice(0, 10) : '',
+        observations: p.observations || '', maintenanceDate: p.maintenanceDate ? p.maintenanceDate.slice(0, 10) : '',
       });
       if (p.employeeName) setEmpSearch(p.employeeName);
     });
@@ -74,6 +81,12 @@ export default function EquipoForm() {
   const selectEmployee = (emp) => {
     setForm({ ...form, employeeId: emp.id });
     setEmpSearch(emp.fullName);
+    setEmpOpen(false);
+  };
+
+  const selectConsultorio = (name) => {
+    setForm({ ...form, employeeId: '', department: name });
+    setEmpSearch(name);
     setEmpOpen(false);
   };
 
@@ -134,6 +147,13 @@ export default function EquipoForm() {
         id, name: form.name, sku: form.sku, model: form.model, description: form.description,
         categoryId: form.categoryId, supplierId: form.supplierId || null,
         employeeId: form.employeeId || null,
+        assetNumber: form.assetNumber || null,
+        department: form.department, physicalLocation: form.physicalLocation,
+        operatingSystem: form.operatingSystem, hardwareConfiguration: form.hardwareConfiguration,
+        status: form.status,
+        acquisitionDate: form.acquisitionDate || null,
+        observations: form.observations,
+        maintenanceDate: form.maintenanceDate || null,
       };
       if (isEdit) await updateProduct(id, payload);
       else await createProduct(payload);
@@ -148,75 +168,135 @@ export default function EquipoForm() {
       <h1>{isEdit ? 'Editar Equipo' : 'Nuevo Equipo'}</h1>
       <form onSubmit={handleSubmit}>
         {error && <div className="alert alert-error">{error}</div>}
+
         <div className="form-row">
           <div className="form-group">
-            <label>Nombre del equipo</label>
-            <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
+            <label>Tipo de Equipo</label>
+            <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required placeholder="Ej: Laptop, Monitor, Impresora" />
           </div>
           <div className="form-group">
-            <label>Modelo</label>
-            <input value={form.model} onChange={(e) => setForm({ ...form, model: e.target.value })} placeholder="Se llena con OCR" />
-          </div>
-        </div>
-        <div className="form-row">
-          <div className="form-group">
-            <label>S/N (Número de serie)</label>
-            <input value={form.sku} onChange={(e) => setForm({ ...form, sku: e.target.value })} required placeholder="Único por equipo" />
-          </div>
-          <div className="form-group">
-            <label>Categoría</label>
+            <label>Marca</label>
             <select value={form.categoryId} onChange={(e) => setForm({ ...form, categoryId: e.target.value })} required>
-              <option value="">Seleccionar categoría</option>
+              <option value="">Seleccionar marca</option>
               {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
             </select>
           </div>
         </div>
-        <div className="form-group">
-          <label>Descripción</label>
-          <textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
-        </div>
+
         <div className="form-row">
           <div className="form-group">
-            <label>Proveedor (opcional)</label>
-            <select value={form.supplierId} onChange={(e) => setForm({ ...form, supplierId: e.target.value })}>
-              <option value="">Sin proveedor</option>
-              {suppliers.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
+            <label>Modelo</label>
+            <input value={form.model} onChange={(e) => setForm({ ...form, model: e.target.value })} placeholder="Se llena con OCR" />
+          </div>
+          <div className="form-group">
+            <label>Nº de Serie</label>
+            <input value={form.sku} onChange={(e) => setForm({ ...form, sku: e.target.value })} required placeholder="Único por equipo" />
+          </div>
+        </div>
+
+        <div className="form-group">
+          <label>Número de Activo</label>
+          <input value={form.assetNumber} onChange={(e) => setForm({ ...form, assetNumber: e.target.value })} placeholder="Opcional" />
+        </div>
+
+        <div className="form-group" ref={empRef} style={{ position: 'relative' }}>
+          <label>Usuario Asignado</label>
+          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 8 }}>
+            {CONSULTORIOS.map((c) => (
+              <button key={c} type="button" className={`btn btn-sm ${form.department === c && !form.employeeId ? 'btn-primary' : ''}`}
+                onClick={() => selectConsultorio(c)}>
+                {c}
+              </button>
+            ))}
+          </div>
+          <input
+            value={empSearch}
+            onChange={(e) => { setEmpSearch(e.target.value); setEmpOpen(true); setForm({ ...form, employeeId: '' }); }}
+            onFocus={() => setEmpOpen(true)}
+            placeholder="Escribe para buscar empleado..."
+          />
+          {empOpen && (
+            <div style={{
+              position: 'absolute', zIndex: 100, background: '#fff', border: '1px solid var(--border)',
+              borderRadius: 'var(--radius)', maxHeight: 200, overflowY: 'auto', width: '100%', marginTop: 2,
+              boxShadow: 'var(--shadow)',
+            }}>
+              {filteredEmps.length === 0 ? (
+                <div style={{ padding: 10, color: 'var(--text-muted)', fontSize: '0.85rem' }}>Sin resultados</div>
+              ) : filteredEmps.map((e) => (
+                <div key={e.id} onClick={() => selectEmployee(e)}
+                  style={{ padding: '8px 12px', cursor: 'pointer', fontSize: '0.9rem', borderBottom: '1px solid var(--border)' }}
+                  onMouseEnter={(e) => e.target.style.background = 'var(--bg)'}
+                  onMouseLeave={(e) => e.target.style.background = 'transparent'}>
+                  {e.fullName} {e.department ? `(${e.department})` : ''}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div className="form-row">
+          <div className="form-group">
+            <label>Departamento</label>
+            <input value={form.department} onChange={(e) => setForm({ ...form, department: e.target.value })} placeholder="Ej: TI, Contabilidad" />
+          </div>
+          <div className="form-group">
+            <label>Ubicación Física</label>
+            <input value={form.physicalLocation} onChange={(e) => setForm({ ...form, physicalLocation: e.target.value })} placeholder="Ej: Edificio A, Piso 2" />
+          </div>
+        </div>
+
+        <div className="form-row">
+          <div className="form-group">
+            <label>Sistema Operativo</label>
+            <input value={form.operatingSystem} onChange={(e) => setForm({ ...form, operatingSystem: e.target.value })} placeholder="N/A si no aplica" />
+          </div>
+          <div className="form-group">
+            <label>Configuración Hardware</label>
+            <input value={form.hardwareConfiguration} onChange={(e) => setForm({ ...form, hardwareConfiguration: e.target.value })} placeholder="Ej: 8GB RAM, 256GB SSD" />
+          </div>
+        </div>
+
+        <div className="form-row">
+          <div className="form-group">
+            <label>Estado</label>
+            <select value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value })}>
+              <option value="">Seleccionar</option>
+              <option value="Bueno">Bueno</option>
+              <option value="Regular">Regular</option>
+              <option value="Malo">Malo</option>
+              <option value="En reparación">En reparación</option>
+              <option value="Dado de baja">Dado de baja</option>
             </select>
           </div>
-          <div className="form-group" ref={empRef} style={{ position: 'relative' }}>
-            <label>Asignado a (opcional)</label>
-            <input
-              value={empSearch}
-              onChange={(e) => { setEmpSearch(e.target.value); setEmpOpen(true); setForm({ ...form, employeeId: '' }); }}
-              onFocus={() => setEmpOpen(true)}
-              placeholder="Escribe para buscar empleado..."
-              style={{ width: '100%' }}
-            />
-            {empOpen && (
-              <div style={{
-                position: 'absolute', zIndex: 100, background: '#fff', border: '1px solid var(--border)',
-                borderRadius: 'var(--radius)', maxHeight: 200, overflowY: 'auto', width: '100%', marginTop: 2,
-                boxShadow: 'var(--shadow)',
-              }}>
-                {filteredEmps.length === 0 ? (
-                  <div style={{ padding: 10, color: 'var(--text-muted)', fontSize: '0.85rem' }}>Sin resultados</div>
-                ) : filteredEmps.map((e) => (
-                  <div key={e.id} onClick={() => selectEmployee(e)}
-                    style={{ padding: '8px 12px', cursor: 'pointer', fontSize: '0.9rem', borderBottom: '1px solid var(--border)' }}
-                    onMouseEnter={(e) => e.target.style.background = 'var(--bg)'}
-                    onMouseLeave={(e) => e.target.style.background = 'transparent'}>
-                    {e.fullName} {e.department ? `(${e.department})` : ''}
-                  </div>
-                ))}
-              </div>
-            )}
+          <div className="form-group">
+            <label>Fecha de Adquisición</label>
+            <input type="date" value={form.acquisitionDate} onChange={(e) => setForm({ ...form, acquisitionDate: e.target.value })} />
           </div>
+        </div>
+
+        <div className="form-group">
+          <label>Observaciones</label>
+          <textarea value={form.observations} onChange={(e) => setForm({ ...form, observations: e.target.value })} placeholder="Opcional" />
+        </div>
+
+        <div className="form-group">
+          <label>Fecha de Mantenimiento</label>
+          <input type="date" value={form.maintenanceDate} onChange={(e) => setForm({ ...form, maintenanceDate: e.target.value })} />
+        </div>
+
+        <div className="form-group">
+          <label>Proveedor (opcional)</label>
+          <select value={form.supplierId} onChange={(e) => setForm({ ...form, supplierId: e.target.value })}>
+            <option value="">Sin proveedor</option>
+            {suppliers.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
+          </select>
         </div>
 
         <div className="form-group">
           <label>Escanear etiqueta (OCR)</label>
           <p className="text-muted" style={{ fontSize: '0.8rem', marginBottom: 8 }}>
-            Sube una foto de la etiqueta o usa la cámara para capturar modelo y S/N automáticamente.
+            Sube una foto de la etiqueta o usa la cámara para capturar modelo y Nº de Serie automáticamente.
           </p>
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 8 }}>
             <button type="button" className="btn btn-accent" onClick={startCamera}>
@@ -249,10 +329,15 @@ export default function EquipoForm() {
                 style={{ width: '100%', padding: '8px 12px', border: '1px solid var(--border)', borderRadius: 'var(--radius)', fontSize: '0.85rem', fontFamily: 'monospace' }}
               />
               <button type="button" className="btn btn-primary" style={{ marginTop: 8 }} onClick={applyOcr}>
-                Aplicar a Modelo y S/N
+                Aplicar a Modelo y Nº de Serie
               </button>
             </div>
           )}
+        </div>
+
+        <div className="form-group">
+          <label>Descripción</label>
+          <textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
         </div>
 
         <div className="form-actions">

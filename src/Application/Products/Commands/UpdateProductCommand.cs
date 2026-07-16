@@ -14,7 +14,16 @@ public record UpdateProductCommand(
     string Model,
     Guid CategoryId,
     Guid? SupplierId,
-    Guid? EmployeeId
+    Guid? EmployeeId,
+    string? AssetNumber = null,
+    string Department = "",
+    string PhysicalLocation = "",
+    string OperatingSystem = "",
+    string HardwareConfiguration = "",
+    string Status = "",
+    DateTime? AcquisitionDate = null,
+    string Observations = "",
+    DateTime? MaintenanceDate = null
 ) : IRequest<ProductDto>;
 
 public class UpdateProductCommandHandler : IRequestHandler<UpdateProductCommand, ProductDto>
@@ -37,6 +46,15 @@ public class UpdateProductCommandHandler : IRequestHandler<UpdateProductCommand,
         product.SetDescription(request.Description);
         product.SetSKU(request.SKU);
         product.SetModel(request.Model);
+        product.SetAssetNumber(request.AssetNumber);
+        product.SetDepartment(request.Department);
+        product.SetPhysicalLocation(request.PhysicalLocation);
+        product.SetOperatingSystem(request.OperatingSystem);
+        product.SetHardwareConfiguration(request.HardwareConfiguration);
+        product.SetStatus(request.Status);
+        product.SetAcquisitionDate(request.AcquisitionDate);
+        product.SetObservations(request.Observations);
+        product.SetMaintenanceDate(request.MaintenanceDate);
         product.AssignCategory(request.CategoryId);
         product.AssignSupplier(request.SupplierId);
         product.AssignEmployee(request.EmployeeId);
@@ -53,6 +71,15 @@ public class UpdateProductCommandHandler : IRequestHandler<UpdateProductCommand,
             CategoryId = product.CategoryId,
             CategoryName = product.Category?.Name ?? string.Empty,
             SupplierId = product.SupplierId,
+            AssetNumber = product.AssetNumber,
+            Department = product.Department,
+            PhysicalLocation = product.PhysicalLocation,
+            OperatingSystem = product.OperatingSystem,
+            HardwareConfiguration = product.HardwareConfiguration,
+            Status = product.Status,
+            AcquisitionDate = product.AcquisitionDate,
+            Observations = product.Observations,
+            MaintenanceDate = product.MaintenanceDate,
             IsActive = product.IsActive,
             CreatedAt = product.CreatedAt
         };

@@ -13,6 +13,15 @@ public class ProductDto
     public string? SupplierName { get; init; }
     public Guid? EmployeeId { get; init; }
     public string? EmployeeName { get; init; }
+    public string? AssetNumber { get; init; }
+    public string Department { get; init; } = string.Empty;
+    public string PhysicalLocation { get; init; } = string.Empty;
+    public string OperatingSystem { get; init; } = string.Empty;
+    public string HardwareConfiguration { get; init; } = string.Empty;
+    public string Status { get; init; } = string.Empty;
+    public DateTime? AcquisitionDate { get; init; }
+    public string Observations { get; init; } = string.Empty;
+    public DateTime? MaintenanceDate { get; init; }
     public bool IsActive { get; init; }
     public DateTime CreatedAt { get; init; }
 }

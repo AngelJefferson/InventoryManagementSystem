@@ -38,6 +38,15 @@ public class GetProductByIdQueryHandler : IRequestHandler<GetProductByIdQuery, P
             SupplierName = product.Supplier?.Name,
             EmployeeId = product.EmployeeId,
             EmployeeName = product.Employee?.FullName,
+            AssetNumber = product.AssetNumber,
+            Department = product.Department,
+            PhysicalLocation = product.PhysicalLocation,
+            OperatingSystem = product.OperatingSystem,
+            HardwareConfiguration = product.HardwareConfiguration,
+            Status = product.Status,
+            AcquisitionDate = product.AcquisitionDate,
+            Observations = product.Observations,
+            MaintenanceDate = product.MaintenanceDate,
             IsActive = product.IsActive,
             CreatedAt = product.CreatedAt
         };

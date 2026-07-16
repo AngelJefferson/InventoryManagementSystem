@@ -50,6 +50,15 @@ public class GetAllProductsQueryHandler : IRequestHandler<GetAllProductsQuery, I
                 SupplierName = p.Supplier != null ? p.Supplier.Name : null,
                 EmployeeId = p.EmployeeId,
                 EmployeeName = p.Employee != null ? p.Employee.FullName : null,
+                AssetNumber = p.AssetNumber,
+                Department = p.Department,
+                PhysicalLocation = p.PhysicalLocation,
+                OperatingSystem = p.OperatingSystem,
+                HardwareConfiguration = p.HardwareConfiguration,
+                Status = p.Status,
+                AcquisitionDate = p.AcquisitionDate,
+                Observations = p.Observations,
+                MaintenanceDate = p.MaintenanceDate,
                 IsActive = p.IsActive,
                 CreatedAt = p.CreatedAt
             })
