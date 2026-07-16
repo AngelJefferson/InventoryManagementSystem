@@ -5,7 +5,11 @@ import { getCategories } from '../api/categoryService';
 import { getEmployees } from '../api/employeeService';
 import * as XLSX from 'xlsx';
 
+const NA = (v) => (v == null || String(v).trim().toUpperCase() === 'N/A' || String(v).trim() === '') ? null : String(v).trim();
+const NA_EMPTY = (v) => NA(v) ?? '';
+
 const COL_MAP = {
+  'Nº': null,
   'Tipo de Equipo': 'name',
   'Marca': 'categoryName',
   'Modelo': 'model',
@@ -17,6 +21,7 @@ const COL_MAP = {
   'Ubicación Física': 'physicalLocation',
   'Sistema Operativo': 'operatingSystem',
   'Configuracion Hardware': 'hardwareConfiguration',
+  'Configuracion Hardware (DD, RAM, Procesador)': 'hardwareConfiguration',
   'Configuración Hardware': 'hardwareConfiguration',
   'Estado': 'status',
   'Fecha de Adquisición': 'acquisitionDate',
@@ -91,6 +96,13 @@ export default function Equipos() {
     e.target.value = '';
   };
 
+  const parseDate = (v) => {
+    const s = NA(v);
+    if (!s) return null;
+    const d = new Date(s);
+    return isNaN(d.getTime()) ? null : d.toISOString();
+  };
+
   const doImport = async () => {
     if (!importData || importData.length === 0) return;
     setImporting(true);
@@ -99,23 +111,24 @@ export default function Equipos() {
       const items = importData.map((row) => {
         const mapped = {};
         for (const [col, field] of Object.entries(COL_MAP)) {
+          if (!field) continue;
           mapped[field] = row[col] !== undefined ? String(row[col]).trim() : '';
         }
         return {
-          name: mapped.name || '',
-          categoryName: mapped.categoryName || '',
-          model: mapped.model || '',
-          sku: mapped.sku || '',
-          assetNumber: mapped.assetNumber || null,
-          employeeName: mapped.employeeName || null,
-          department: mapped.department || '',
-          physicalLocation: mapped.physicalLocation || '',
-          operatingSystem: mapped.operatingSystem || '',
-          hardwareConfiguration: mapped.hardwareConfiguration || '',
-          status: mapped.status || '',
-          acquisitionDate: mapped.acquisitionDate ? new Date(mapped.acquisitionDate).toISOString() : null,
-          observations: mapped.observations || '',
-          maintenanceDate: mapped.maintenanceDate ? new Date(mapped.maintenanceDate).toISOString() : null,
+          name: NA_EMPTY(mapped.name),
+          categoryName: NA_EMPTY(mapped.categoryName),
+          model: NA_EMPTY(mapped.model),
+          sku: NA_EMPTY(mapped.sku),
+          assetNumber: NA(mapped.assetNumber),
+          employeeName: NA(mapped.employeeName),
+          department: NA_EMPTY(mapped.department),
+          physicalLocation: NA_EMPTY(mapped.physicalLocation),
+          operatingSystem: NA_EMPTY(mapped.operatingSystem),
+          hardwareConfiguration: NA_EMPTY(mapped.hardwareConfiguration),
+          status: NA_EMPTY(mapped.status),
+          acquisitionDate: parseDate(mapped.acquisitionDate),
+          observations: NA_EMPTY(mapped.observations),
+          maintenanceDate: parseDate(mapped.maintenanceDate),
         };
       });
       const res = await bulkCreateProducts({ products: items });
