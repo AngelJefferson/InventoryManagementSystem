@@ -79,13 +79,13 @@ export default function EquipoForm() {
   );
 
   const selectEmployee = (emp) => {
-    setForm({ ...form, employeeId: emp.id });
+    setForm({ ...form, employeeId: emp.id, department: emp.department || '' });
     setEmpSearch(emp.fullName);
     setEmpOpen(false);
   };
 
   const selectConsultorio = (name) => {
-    setForm({ ...form, employeeId: '', department: name });
+    setForm({ ...form, employeeId: '' });
     setEmpSearch(name);
     setEmpOpen(false);
   };
@@ -190,7 +190,7 @@ export default function EquipoForm() {
           </div>
           <div className="form-group">
             <label>Nº de Serie</label>
-            <input value={form.sku} onChange={(e) => setForm({ ...form, sku: e.target.value })} required placeholder="Único por equipo" />
+            <input value={form.sku} onChange={(e) => setForm({ ...form, sku: e.target.value })} required placeholder="Se llena con OCR" />
           </div>
         </div>
 
@@ -203,7 +203,7 @@ export default function EquipoForm() {
           <label>Usuario Asignado</label>
           <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 8 }}>
             {CONSULTORIOS.map((c) => (
-              <button key={c} type="button" className={`btn btn-sm ${form.department === c && !form.employeeId ? 'btn-primary' : ''}`}
+              <button key={c} type="button" className={`btn btn-sm ${empSearch === c && !form.employeeId ? 'btn-primary' : ''}`}
                 onClick={() => selectConsultorio(c)}>
                 {c}
               </button>
@@ -262,11 +262,9 @@ export default function EquipoForm() {
             <label>Estado</label>
             <select value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value })}>
               <option value="">Seleccionar</option>
-              <option value="Bueno">Bueno</option>
-              <option value="Regular">Regular</option>
-              <option value="Malo">Malo</option>
-              <option value="En reparación">En reparación</option>
-              <option value="Dado de baja">Dado de baja</option>
+              <option value="Operativo">Operativo</option>
+              <option value="Dañado">Dañado</option>
+              <option value="Reparación">Reparación</option>
             </select>
           </div>
           <div className="form-group">
@@ -333,11 +331,6 @@ export default function EquipoForm() {
               </button>
             </div>
           )}
-        </div>
-
-        <div className="form-group">
-          <label>Descripción</label>
-          <textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
         </div>
 
         <div className="form-actions">
