@@ -6,7 +6,7 @@ using MediatR;
 
 namespace InventoryManagement.Application.Employees.Commands;
 
-public record CreateEmployeeCommand(string FullName, string Department, string Sede, string Position, string Email) : IRequest<EmployeeDto>;
+public record CreateEmployeeCommand(string FullName, string Department, string Sede, string Position, string Email = "") : IRequest<EmployeeDto>;
 
 public class CreateEmployeeCommandHandler : IRequestHandler<CreateEmployeeCommand, EmployeeDto>
 {
@@ -31,7 +31,6 @@ public class CreateEmployeeCommandHandler : IRequestHandler<CreateEmployeeComman
             Department = employee.Department,
             Sede = employee.Sede,
             Position = employee.Position,
-            Email = employee.Email,
             IsActive = employee.IsActive,
             CreatedAt = employee.CreatedAt
         };
@@ -49,6 +48,5 @@ public class CreateEmployeeCommandValidator : AbstractValidator<CreateEmployeeCo
         RuleFor(v => v.Department).MaximumLength(100);
         RuleFor(v => v.Sede).MaximumLength(100);
         RuleFor(v => v.Position).MaximumLength(100);
-        RuleFor(v => v.Email).MaximumLength(200);
     }
 }

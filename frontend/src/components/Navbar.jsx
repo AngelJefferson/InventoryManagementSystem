@@ -52,7 +52,6 @@ export default function Navbar() {
           <NavLink to="/" end>Inicio</NavLink>
           <NavLink to="/equipos">Equipos</NavLink>
           <NavLink to="/categorias">Categorías</NavLink>
-          <NavLink to="/proveedores">Proveedores</NavLink>
           <NavLink to="/empleados">Empleados</NavLink>
         </div>
         <div className="nav-user">
@@ -64,7 +63,6 @@ export default function Navbar() {
           <NavLink to="/" end onClick={() => setMenuOpen(false)}>Inicio</NavLink>
           <NavLink to="/equipos" onClick={() => setMenuOpen(false)}>Equipos</NavLink>
           <NavLink to="/categorias" onClick={() => setMenuOpen(false)}>Categorías</NavLink>
-          <NavLink to="/proveedores" onClick={() => setMenuOpen(false)}>Proveedores</NavLink>
           <NavLink to="/empleados" onClick={() => setMenuOpen(false)}>Empleados</NavLink>
           <div className="nav-mobile-user">
             <span>{user?.username} ({user?.role})</span>

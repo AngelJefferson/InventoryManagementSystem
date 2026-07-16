@@ -55,8 +55,13 @@ public class BulkCreateProductsCommandHandler : IRequestHandler<BulkCreateProduc
             if (!string.IsNullOrWhiteSpace(item.EmployeeName))
             {
                 var employee = employees.FirstOrDefault(e => e.FullName.Equals(item.EmployeeName, StringComparison.OrdinalIgnoreCase));
-                if (employee != null)
-                    employeeId = employee.Id;
+                if (employee == null)
+                {
+                    employee = new Employee(item.EmployeeName, item.Department, item.PhysicalLocation, "", "");
+                    _context.Employees.Add(employee);
+                    employees.Add(employee);
+                }
+                employeeId = employee.Id;
             }
 
             var product = new Product(

@@ -2,7 +2,6 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { getProduct, createProduct, updateProduct } from '../api/productService';
 import { getCategories } from '../api/categoryService';
-import { getSuppliers } from '../api/supplierService';
 import { getEmployees } from '../api/employeeService';
 
 async function runOcr(imageSrc, setOcrText) {
@@ -34,10 +33,10 @@ export default function EquipoForm() {
   const navigate = useNavigate();
   const isEdit = Boolean(id);
   const [categories, setCategories] = useState([]);
-  const [suppliers, setSuppliers] = useState([]);
+
   const [employees, setEmployees] = useState([]);
   const [form, setForm] = useState({
-    name: '', sku: '', model: '', description: '', categoryId: '', supplierId: '', employeeId: '',
+    name: '', sku: '', model: '', description: '', categoryId: '', employeeId: '',
     assetNumber: '', department: '', physicalLocation: '', operatingSystem: '',
     hardwareConfiguration: '', status: '', acquisitionDate: '', observations: '', maintenanceDate: '',
   });
@@ -56,13 +55,12 @@ export default function EquipoForm() {
 
   useEffect(() => {
     getCategories().then((r) => setCategories(r.data));
-    getSuppliers().then((r) => setSuppliers(r.data));
     getEmployees().then((r) => setEmployees(r.data));
     if (isEdit) getProduct(id).then((r) => {
       const p = r.data;
       setForm({
         name: p.name, sku: p.sku, model: p.model || '', description: p.description || '',
-        categoryId: p.categoryId, supplierId: p.supplierId || '', employeeId: p.employeeId || '',
+        categoryId: p.categoryId, employeeId: p.employeeId || '',
         assetNumber: p.assetNumber || '', department: p.department || '',
         physicalLocation: p.physicalLocation || '', operatingSystem: p.operatingSystem || '',
         hardwareConfiguration: p.hardwareConfiguration || '', status: p.status || '',
@@ -146,7 +144,7 @@ export default function EquipoForm() {
     try {
       const payload = {
         id, name: form.name, sku: form.sku, model: form.model, description: form.description,
-        categoryId: form.categoryId, supplierId: form.supplierId || null,
+        categoryId: form.categoryId,
         employeeId: form.employeeId || null,
         assetNumber: form.assetNumber || null,
         department: form.department, physicalLocation: form.physicalLocation,
@@ -283,14 +281,6 @@ export default function EquipoForm() {
         <div className="form-group">
           <label>Fecha de Mantenimiento</label>
           <input type="date" value={form.maintenanceDate} onChange={(e) => setForm({ ...form, maintenanceDate: e.target.value })} />
-        </div>
-
-        <div className="form-group">
-          <label>Proveedor (opcional)</label>
-            <select value={form.supplierId} onChange={(e) => setForm({ ...form, supplierId: e.target.value })} className={fcls(form.supplierId)}>
-            <option value="">Sin proveedor</option>
-            {suppliers.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
-          </select>
         </div>
 
         <div className="form-group">

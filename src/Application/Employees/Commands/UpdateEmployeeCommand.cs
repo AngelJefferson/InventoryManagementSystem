@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace InventoryManagement.Application.Employees.Commands;
 
-public record UpdateEmployeeCommand(Guid Id, string FullName, string Department, string Sede, string Position, string Email) : IRequest<EmployeeDto>;
+public record UpdateEmployeeCommand(Guid Id, string FullName, string Department, string Sede, string Position, string Email = "") : IRequest<EmployeeDto>;
 
 public class UpdateEmployeeCommandHandler : IRequestHandler<UpdateEmployeeCommand, EmployeeDto>
 {
@@ -38,7 +38,6 @@ public class UpdateEmployeeCommandHandler : IRequestHandler<UpdateEmployeeComman
             Department = employee.Department,
             Sede = employee.Sede,
             Position = employee.Position,
-            Email = employee.Email,
             IsActive = employee.IsActive,
             CreatedAt = employee.CreatedAt
         };
@@ -56,6 +55,5 @@ public class UpdateEmployeeCommandValidator : AbstractValidator<UpdateEmployeeCo
         RuleFor(v => v.Department).MaximumLength(100);
         RuleFor(v => v.Sede).MaximumLength(100);
         RuleFor(v => v.Position).MaximumLength(100);
-        RuleFor(v => v.Email).MaximumLength(200);
     }
 }

@@ -7,7 +7,7 @@ export default function EmpleadoForm() {
   const navigate = useNavigate();
   const isEdit = Boolean(id);
   const [form, setForm] = useState({
-    fullName: '', department: '', sede: '', position: '', email: '',
+    fullName: '', department: '', sede: '', position: '',
   });
   const [error, setError] = useState('');
 
@@ -16,7 +16,7 @@ export default function EmpleadoForm() {
       const e = r.data;
       setForm({
         fullName: e.fullName, department: e.department || '',
-        sede: e.sede || '', position: e.position || '', email: e.email || '',
+        sede: e.sede || '', position: e.position || '',
       });
     });
   }, [id]);
@@ -57,10 +57,6 @@ export default function EmpleadoForm() {
             <label>Puesto</label>
             <input value={form.position} onChange={(e) => setForm({ ...form, position: e.target.value })} />
           </div>
-        </div>
-        <div className="form-group">
-          <label>Correo electrónico</label>
-          <input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
         </div>
         <div className="form-actions">
           <button type="submit" className="btn btn-primary">{isEdit ? 'Actualizar' : 'Crear'}</button>

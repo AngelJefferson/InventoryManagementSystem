@@ -30,7 +30,6 @@ public class GetEmployeeByIdQueryHandler : IRequestHandler<GetEmployeeByIdQuery,
             Department = employee.Department,
             Sede = employee.Sede,
             Position = employee.Position,
-            Email = employee.Email,
             IsActive = employee.IsActive,
             AssignedEquipmentCount = employee.Products.Count,
             CreatedAt = employee.CreatedAt
