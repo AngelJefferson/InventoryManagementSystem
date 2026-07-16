@@ -183,7 +183,6 @@ export default function Equipos() {
               <th>Departamento</th>
               <th>Ubicación</th>
               <th>Estado</th>
-              <th>Proveedor</th>
               <th>Acciones</th>
             </tr>
           </thead>
@@ -199,7 +198,6 @@ export default function Equipos() {
                 <td>{p.department || <span className="text-muted">—</span>}</td>
                 <td>{p.physicalLocation || <span className="text-muted">—</span>}</td>
                 <td>{p.status || <span className="text-muted">—</span>}</td>
-                <td>{p.supplierName || <span className="text-muted">—</span>}</td>
                 <td className="actions">
                   <Link to={`/equipos/${p.id}/editar`} className="btn btn-sm">Editar</Link>
                   <button onClick={() => handleDelete(p.id)} className="btn btn-sm btn-danger">Eliminar</button>
@@ -207,7 +205,7 @@ export default function Equipos() {
               </tr>
             ))}
             {filtered.length === 0 && (
-              <tr><td colSpan="11" className="text-center">No se encontraron equipos</td></tr>
+              <tr><td colSpan="10" className="text-center">No se encontraron equipos</td></tr>
             )}
           </tbody>
         </table>
