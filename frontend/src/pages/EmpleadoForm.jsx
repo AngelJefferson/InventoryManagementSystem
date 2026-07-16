@@ -28,7 +28,7 @@ export default function EmpleadoForm() {
       else await createEmployee(form);
       navigate('/empleados');
     } catch (err) {
-      setError(err.response?.data?.title || 'Error al guardar el empleado');
+      const data = err.response?.data; setError(data?.title || data?.error || data?.detail || 'Error al guardar el empleado');
     }
   };
 

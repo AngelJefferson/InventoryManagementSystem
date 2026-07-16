@@ -159,7 +159,8 @@ export default function EquipoForm() {
       else await createProduct(payload);
       navigate('/equipos');
     } catch (err) {
-      setError(err.response?.data?.title || 'Error al guardar el equipo');
+      const data = err.response?.data;
+      setError(data?.title || data?.error || data?.detail || 'Error al guardar el equipo');
     }
   };
 

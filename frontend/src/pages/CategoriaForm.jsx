@@ -20,7 +20,7 @@ export default function CategoriaForm() {
       else await createCategory(form);
       navigate('/categorias');
     } catch (err) {
-      setError(err.response?.data?.title || 'Error al guardar la categoría');
+      const data = err.response?.data; setError(data?.title || data?.error || data?.detail || 'Error al guardar la categoría');
     }
   };
 

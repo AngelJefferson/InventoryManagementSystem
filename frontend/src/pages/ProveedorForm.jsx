@@ -23,7 +23,7 @@ export default function ProveedorForm() {
       else await createSupplier(form);
       navigate('/proveedores');
     } catch (err) {
-      setError(err.response?.data?.title || 'Error al guardar el proveedor');
+      const data = err.response?.data; setError(data?.title || data?.error || data?.detail || 'Error al guardar el proveedor');
     }
   };
 
