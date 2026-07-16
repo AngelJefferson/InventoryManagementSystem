@@ -19,6 +19,7 @@ public class GetEmployeeByIdQueryHandler : IRequestHandler<GetEmployeeByIdQuery,
     public async Task<EmployeeDto> Handle(GetEmployeeByIdQuery request, CancellationToken cancellationToken)
     {
         var employee = await _context.Employees
+            .Include(e => e.Products)
             .FirstOrDefaultAsync(e => e.Id == request.Id, cancellationToken)
             ?? throw new KeyNotFoundException($"Employee with Id {request.Id} not found.");
 
@@ -30,6 +31,7 @@ public class GetEmployeeByIdQueryHandler : IRequestHandler<GetEmployeeByIdQuery,
             Position = employee.Position,
             Email = employee.Email,
             IsActive = employee.IsActive,
+            AssignedEquipmentCount = employee.Products.Count,
             CreatedAt = employee.CreatedAt
         };
     }

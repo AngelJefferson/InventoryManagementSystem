@@ -10,6 +10,7 @@ public class Employee
     public bool IsActive { get; private set; }
     public DateTime CreatedAt { get; private set; }
     public DateTime? UpdatedAt { get; private set; }
+    public ICollection<Product> Products { get; private set; } = new List<Product>();
 
     private Employee() { }
 

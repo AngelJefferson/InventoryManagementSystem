@@ -8,5 +8,6 @@ public class EmployeeDto
     public string Position { get; init; } = string.Empty;
     public string Email { get; init; } = string.Empty;
     public bool IsActive { get; init; }
+    public int AssignedEquipmentCount { get; init; }
     public DateTime CreatedAt { get; init; }
 }

@@ -27,6 +27,7 @@ public class GetAllEmployeesQueryHandler : IRequestHandler<GetAllEmployeesQuery,
                 Position = e.Position,
                 Email = e.Email,
                 IsActive = e.IsActive,
+                AssignedEquipmentCount = e.Products.Count,
                 CreatedAt = e.CreatedAt
             })
             .ToListAsync(cancellationToken);
