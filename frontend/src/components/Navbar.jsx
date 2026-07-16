@@ -7,6 +7,7 @@ export default function Navbar() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [showPwModal, setShowPwModal] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   const [pwForm, setPwForm] = useState({ oldPassword: '', newPassword: '', confirmPassword: '' });
   const [pwError, setPwError] = useState('');
   const [pwSuccess, setPwSuccess] = useState('');
@@ -42,19 +43,22 @@ export default function Navbar() {
     <>
       <nav className="navbar">
         <div className="nav-brand">
-          <NavLink to="/">InventarioCAID</NavLink>
+          <NavLink to="/" onClick={() => setMenuOpen(false)}>InventarioCAID</NavLink>
         </div>
-        <div className="nav-links">
-          <NavLink to="/" end>Inicio</NavLink>
-          <NavLink to="/equipos">Equipos</NavLink>
-          <NavLink to="/categorias">Categorías</NavLink>
-          <NavLink to="/proveedores">Proveedores</NavLink>
-          <NavLink to="/empleados">Empleados</NavLink>
+        <button className="nav-toggle" onClick={() => setMenuOpen(!menuOpen)}>
+          {menuOpen ? '✕' : '☰'}
+        </button>
+        <div className={`nav-links${menuOpen ? ' open' : ''}`}>
+          <NavLink to="/" end onClick={() => setMenuOpen(false)}>Inicio</NavLink>
+          <NavLink to="/equipos" onClick={() => setMenuOpen(false)}>Equipos</NavLink>
+          <NavLink to="/categorias" onClick={() => setMenuOpen(false)}>Categorías</NavLink>
+          <NavLink to="/proveedores" onClick={() => setMenuOpen(false)}>Proveedores</NavLink>
+          <NavLink to="/empleados" onClick={() => setMenuOpen(false)}>Empleados</NavLink>
         </div>
-        <div className="nav-user">
+        <div className={`nav-user${menuOpen ? ' open' : ''}`}>
           <span>{user?.username} ({user?.role})</span>
-          <button onClick={() => setShowPwModal(true)} className="btn-link">Cambiar Contraseña</button>
-          <button onClick={handleLogout} className="btn-link">Cerrar Sesión</button>
+          <button onClick={() => { setShowPwModal(true); setMenuOpen(false); }} className="btn-link">Cambiar Contraseña</button>
+          <button onClick={() => { handleLogout(); setMenuOpen(false); }} className="btn-link">Cerrar Sesión</button>
         </div>
       </nav>
 

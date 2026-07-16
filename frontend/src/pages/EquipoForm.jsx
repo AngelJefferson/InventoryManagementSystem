@@ -5,6 +5,25 @@ import { getCategories } from '../api/categoryService';
 import { getSuppliers } from '../api/supplierService';
 import { getEmployees } from '../api/employeeService';
 
+async function runOcr(imageSrc, form, setForm, setOcrText) {
+  try {
+    const Tesseract = await import('tesseract.js');
+    const { data } = await Tesseract.recognize(imageSrc, 'spa');
+    setOcrText(data.text);
+    const lines = data.text.split('\n').filter((l) => l.trim());
+    const updates = {};
+    if (lines.length >= 2 && !form.model && !form.sku) {
+      updates.model = lines[0].trim();
+      updates.sku = lines[1].trim();
+    } else if (lines.length > 0 && !form.sku) {
+      updates.sku = lines[0].trim();
+    }
+    if (Object.keys(updates).length) setForm({ ...form, ...updates });
+  } catch (err) {
+    alert('Error al procesar la imagen: ' + err.message);
+  }
+}
+
 export default function EquipoForm() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -20,10 +39,12 @@ export default function EquipoForm() {
   const [ocrText, setOcrText] = useState('');
   const [empSearch, setEmpSearch] = useState('');
   const [empOpen, setEmpOpen] = useState(false);
+  const [ocrLoading, setOcrLoading] = useState(false);
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const streamRef = useRef(null);
   const empRef = useRef(null);
+  const fileRef = useRef(null);
 
   useEffect(() => {
     getCategories().then((r) => setCategories(r.data));
@@ -79,19 +100,22 @@ export default function EquipoForm() {
     canvas.getContext('2d').drawImage(video, 0, 0);
     const imageData = canvas.toDataURL('image/jpeg');
     stopCamera();
-    try {
-      const Tesseract = await import('tesseract.js');
-      const { data } = await Tesseract.recognize(imageData, 'spa');
-      setOcrText(data.text);
-      const lines = data.text.split('\n').filter((l) => l.trim());
-      if (lines.length >= 2 && !form.model && !form.sku) {
-        setForm({ ...form, model: lines[0].trim(), sku: lines[1].trim() });
-      } else if (lines.length > 0 && !form.sku) {
-        setForm({ ...form, sku: lines[0].trim() });
-      }
-    } catch (err) {
-      alert('Error al procesar la imagen: ' + err.message);
-    }
+    setOcrLoading(true);
+    await runOcr(imageData, form, setForm, setOcrText);
+    setOcrLoading(false);
+  };
+
+  const handleFileUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setOcrLoading(true);
+    const reader = new FileReader();
+    reader.onload = async (ev) => {
+      await runOcr(ev.target.result, form, setForm, setOcrText);
+      setOcrLoading(false);
+    };
+    reader.readAsDataURL(file);
+    e.target.value = '';
   };
 
   const handleSubmit = async (e) => {
@@ -122,7 +146,7 @@ export default function EquipoForm() {
           </div>
           <div className="form-group">
             <label>Modelo</label>
-            <input value={form.model} onChange={(e) => setForm({ ...form, model: e.target.value })} />
+            <input value={form.model} onChange={(e) => setForm({ ...form, model: e.target.value })} placeholder="Se llena con OCR" />
           </div>
         </div>
         <div className="form-row">
@@ -183,13 +207,19 @@ export default function EquipoForm() {
         <div className="form-group">
           <label>Escanear etiqueta (OCR)</label>
           <p className="text-muted" style={{ fontSize: '0.8rem', marginBottom: 8 }}>
-            Usa la cámara para capturar el modelo y número de serie automáticamente.
+            Sube una foto de la etiqueta o usa la cámara para capturar modelo y S/N automáticamente.
           </p>
-          {!showScanner ? (
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 8 }}>
             <button type="button" className="btn btn-accent" onClick={startCamera}>
               📷 Abrir cámara
             </button>
-          ) : (
+            <button type="button" className="btn btn-primary" onClick={() => fileRef.current?.click()}>
+              📁 Subir foto
+            </button>
+            <input ref={fileRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={handleFileUpload} />
+          </div>
+          {ocrLoading && <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>Procesando imagen...</p>}
+          {showScanner && (
             <div className="scanner-section">
               <h3>Escáner de etiquetas</h3>
               <video ref={videoRef} autoPlay playsInline className="video-preview" />
@@ -198,12 +228,12 @@ export default function EquipoForm() {
                 <button type="button" className="btn btn-primary" onClick={capturePhoto}>Capturar</button>
                 <button type="button" className="btn" onClick={stopCamera}>Cancelar</button>
               </div>
-              {ocrText && (
-                <div style={{ marginTop: 8 }}>
-                  <strong>Texto detectado:</strong>
-                  <pre style={{ background: '#f5f5f5', padding: 8, borderRadius: 4, marginTop: 4, fontSize: '0.8rem' }}>{ocrText}</pre>
-                </div>
-              )}
+            </div>
+          )}
+          {ocrText && !showScanner && (
+            <div style={{ marginTop: 8 }}>
+              <strong>Texto detectado:</strong>
+              <pre style={{ background: '#f5f5f5', padding: 8, borderRadius: 4, marginTop: 4, fontSize: '0.8rem', whiteSpace: 'pre-wrap' }}>{ocrText}</pre>
             </div>
           )}
         </div>
