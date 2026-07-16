@@ -22,7 +22,8 @@ export default function Empleados() {
 
   const filtered = employees.filter((e) =>
     e.fullName.toLowerCase().includes(search.toLowerCase()) ||
-    (e.department || '').toLowerCase().includes(search.toLowerCase())
+    (e.department || '').toLowerCase().includes(search.toLowerCase()) ||
+    (e.sede || '').toLowerCase().includes(search.toLowerCase())
   );
 
   if (loading) return <div className="loading">Cargando...</div>;
@@ -43,6 +44,7 @@ export default function Empleados() {
             <tr>
               <th>Nombre completo</th>
               <th>Departamento</th>
+              <th>Sede</th>
               <th>Puesto</th>
               <th>Correo</th>
               <th>Equipos asignados</th>
@@ -54,6 +56,7 @@ export default function Empleados() {
               <tr key={e.id}>
                 <td>{e.fullName}</td>
                 <td>{e.department}</td>
+                <td>{e.sede || <span className="text-muted">—</span>}</td>
                 <td>{e.position}</td>
                 <td>{e.email}</td>
                 <td>{e.assignedEquipmentCount ?? 0}</td>
@@ -64,7 +67,7 @@ export default function Empleados() {
               </tr>
             ))}
             {filtered.length === 0 && (
-              <tr><td colSpan="6" className="text-center">No se encontraron empleados</td></tr>
+              <tr><td colSpan="7" className="text-center">No se encontraron empleados</td></tr>
             )}
           </tbody>
         </table>

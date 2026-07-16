@@ -45,13 +45,13 @@ export default function EmpleadoForm() {
           </div>
           <div className="form-group">
             <label>Departamento</label>
-            <input value={form.department} onChange={(e) => setForm({ ...form, department: e.target.value })} placeholder="Ej: TI, Contabilidad" />
+            <input value={form.department} onChange={(e) => setForm({ ...form, department: e.target.value })} />
           </div>
         </div>
         <div className="form-row">
           <div className="form-group">
             <label>Sede</label>
-            <input value={form.sede} onChange={(e) => setForm({ ...form, sede: e.target.value })} placeholder="Ej: Edificio A, Piso 2" />
+            <input value={form.sede} onChange={(e) => setForm({ ...form, sede: e.target.value })} />
           </div>
           <div className="form-group">
             <label>Puesto</label>

@@ -30,8 +30,6 @@ export default function Equipos() {
   const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
-  const [filterDept, setFilterDept] = useState('');
-  const [filterUbic, setFilterUbic] = useState('');
   const [showImport, setShowImport] = useState(false);
   const [importData, setImportData] = useState(null);
   const [importing, setImporting] = useState(false);
@@ -132,18 +130,15 @@ export default function Equipos() {
     }
   };
 
-  const depts = [...new Set(products.map((p) => p.department).filter(Boolean))].sort();
-  const ubics = [...new Set(products.map((p) => p.physicalLocation).filter(Boolean))].sort();
-
   const filtered = products.filter((p) => {
-    if (search && !p.name.toLowerCase().includes(search.toLowerCase()) &&
-      !(p.model || '').toLowerCase().includes(search.toLowerCase()) &&
-      !p.sku.toLowerCase().includes(search.toLowerCase()) &&
-      !(p.assetNumber || '').toLowerCase().includes(search.toLowerCase()))
-      return false;
-    if (filterDept && p.department !== filterDept) return false;
-    if (filterUbic && p.physicalLocation !== filterUbic) return false;
-    return true;
+    if (!search) return true;
+    const q = search.toLowerCase();
+    return p.name.toLowerCase().includes(q) ||
+      (p.model || '').toLowerCase().includes(q) ||
+      p.sku.toLowerCase().includes(q) ||
+      (p.assetNumber || '').toLowerCase().includes(q) ||
+      (p.categoryName || '').toLowerCase().includes(q) ||
+      (p.department || '').toLowerCase().includes(q);
   });
 
   if (loading) return <div className="loading">Cargando...</div>;
@@ -155,20 +150,12 @@ export default function Equipos() {
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
           <button className="btn btn-accent" onClick={exportExcel}>📥 Exportar</button>
           <button className="btn btn-primary" onClick={() => { setShowImport(true); setImportMsg(''); setImportData(null); }}>📂 Cargar Excel</button>
-          <Link to="/equipos/nuevo" className="btn">+ Nuevo Equipo</Link>
+          <Link to="/equipos/nuevo" className="btn btn-success">+ Nuevo Equipo</Link>
         </div>
       </div>
       <div className="search-bar">
-        <input placeholder="Buscar equipo por nombre, modelo, Nº de Serie o activo..." value={search}
+        <input placeholder="Buscar por equipo, modelo, serie, marca o departamento..." value={search}
           onChange={(e) => setSearch(e.target.value)} />
-        <select value={filterDept} onChange={(e) => setFilterDept(e.target.value)}>
-          <option value="">Todos los deptos</option>
-          {depts.map((d) => <option key={d} value={d}>{d}</option>)}
-        </select>
-        <select value={filterUbic} onChange={(e) => setFilterUbic(e.target.value)}>
-          <option value="">Todas las ubicaciones</option>
-          {ubics.map((u) => <option key={u} value={u}>{u}</option>)}
-        </select>
       </div>
       <div className="table-container">
         <table className="table">

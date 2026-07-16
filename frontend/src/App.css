@@ -194,6 +194,14 @@ body {
 
 .btn-danger:hover { background: #BD2130; }
 
+.btn-success {
+  background: #28A745;
+  color: #fff;
+  border-color: #28A745;
+}
+
+.btn-success:hover { background: #218838; }
+
 .btn-sm { padding: 6px 12px; font-size: 0.8rem; }
 .btn-block { width: 100%; }
 .btn-link {
