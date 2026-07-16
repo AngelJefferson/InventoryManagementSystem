@@ -43,11 +43,23 @@ export default function Navbar() {
     <>
       <nav className="navbar">
         <div className="nav-brand">
-          <NavLink to="/" onClick={() => setMenuOpen(false)}>InventarioCAID</NavLink>
+          <NavLink to="/">InventarioCAID</NavLink>
         </div>
         <button className="nav-toggle" onClick={() => setMenuOpen(!menuOpen)}>
           {menuOpen ? '✕' : '☰'}
         </button>
+        <div className="nav-links">
+          <NavLink to="/" end>Inicio</NavLink>
+          <NavLink to="/equipos">Equipos</NavLink>
+          <NavLink to="/categorias">Categorías</NavLink>
+          <NavLink to="/proveedores">Proveedores</NavLink>
+          <NavLink to="/empleados">Empleados</NavLink>
+        </div>
+        <div className="nav-user">
+          <span>{user?.username} ({user?.role})</span>
+          <button onClick={() => setShowPwModal(true)} className="btn-link">Cambiar Contraseña</button>
+          <button onClick={handleLogout} className="btn-link">Cerrar Sesión</button>
+        </div>
         <div className={`mobile-menu${menuOpen ? ' open' : ''}`}>
           <NavLink to="/" end onClick={() => setMenuOpen(false)}>Inicio</NavLink>
           <NavLink to="/equipos" onClick={() => setMenuOpen(false)}>Equipos</NavLink>

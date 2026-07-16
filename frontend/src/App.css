@@ -414,6 +414,9 @@ body {
   margin-bottom: 12px;
 }
 
+/* === MOBILE MENU (hidden on desktop) === */
+.mobile-menu { display: none; }
+
 /* === HAMBURGUER (mobile) === */
 .nav-toggle {
   display: none;
@@ -435,7 +438,7 @@ body {
     display: none;
   }
 
-  .mobile-menu {
+    .mobile-menu {
     display: none;
   }
 
@@ -471,6 +474,8 @@ body {
   .mobile-menu.open .nav-mobile-user span {
     color: rgba(255,255,255,0.7);
   }
+
+  .nav-links, .nav-user { display: none; }
 
   .main-content {
     padding: 16px;
