@@ -5,23 +5,28 @@ import { getCategories } from '../api/categoryService';
 import { getSuppliers } from '../api/supplierService';
 import { getEmployees } from '../api/employeeService';
 
-async function runOcr(imageSrc, form, setForm, setOcrText) {
+async function runOcr(imageSrc, setOcrText) {
   try {
     const Tesseract = await import('tesseract.js');
     const { data } = await Tesseract.recognize(imageSrc, 'spa');
     setOcrText(data.text);
-    const lines = data.text.split('\n').filter((l) => l.trim());
-    const updates = {};
-    if (lines.length >= 2 && !form.model && !form.sku) {
-      updates.model = lines[0].trim();
-      updates.sku = lines[1].trim();
-    } else if (lines.length > 0 && !form.sku) {
-      updates.sku = lines[0].trim();
-    }
-    if (Object.keys(updates).length) setForm({ ...form, ...updates });
+    return data.text;
   } catch (err) {
     alert('Error al procesar la imagen: ' + err.message);
+    return '';
   }
+}
+
+function applyOcrText(ocrText, form, setForm) {
+  const lines = ocrText.split('\n').filter((l) => l.trim());
+  const updates = {};
+  if (lines.length >= 2) {
+    updates.model = lines[0].trim();
+    updates.sku = lines[1].trim();
+  } else if (lines.length === 1) {
+    updates.sku = lines[0].trim();
+  }
+  if (Object.keys(updates).length) setForm({ ...form, ...updates });
 }
 
 export default function EquipoForm() {
@@ -101,7 +106,7 @@ export default function EquipoForm() {
     const imageData = canvas.toDataURL('image/jpeg');
     stopCamera();
     setOcrLoading(true);
-    await runOcr(imageData, form, setForm, setOcrText);
+    await runOcr(imageData, setOcrText);
     setOcrLoading(false);
   };
 
@@ -111,11 +116,15 @@ export default function EquipoForm() {
     setOcrLoading(true);
     const reader = new FileReader();
     reader.onload = async (ev) => {
-      await runOcr(ev.target.result, form, setForm, setOcrText);
+      await runOcr(ev.target.result, setOcrText);
       setOcrLoading(false);
     };
     reader.readAsDataURL(file);
     e.target.value = '';
+  };
+
+  const applyOcr = () => {
+    applyOcrText(ocrText, form, setForm);
   };
 
   const handleSubmit = async (e) => {
@@ -231,9 +240,17 @@ export default function EquipoForm() {
             </div>
           )}
           {ocrText && !showScanner && (
-            <div style={{ marginTop: 8 }}>
-              <strong>Texto detectado:</strong>
-              <pre style={{ background: '#f5f5f5', padding: 8, borderRadius: 4, marginTop: 4, fontSize: '0.8rem', whiteSpace: 'pre-wrap' }}>{ocrText}</pre>
+            <div style={{ marginTop: 8 }} className="scanner-section">
+              <label style={{ fontWeight: 600, display: 'block', marginBottom: 6 }}>Texto detectado (puedes editarlo):</label>
+              <textarea
+                value={ocrText}
+                onChange={(e) => setOcrText(e.target.value)}
+                rows={4}
+                style={{ width: '100%', padding: '8px 12px', border: '1px solid var(--border)', borderRadius: 'var(--radius)', fontSize: '0.85rem', fontFamily: 'monospace' }}
+              />
+              <button type="button" className="btn btn-primary" style={{ marginTop: 8 }} onClick={applyOcr}>
+                Aplicar a Modelo y S/N
+              </button>
             </div>
           )}
         </div>

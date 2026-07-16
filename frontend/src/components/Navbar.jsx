@@ -48,17 +48,17 @@ export default function Navbar() {
         <button className="nav-toggle" onClick={() => setMenuOpen(!menuOpen)}>
           {menuOpen ? '✕' : '☰'}
         </button>
-        <div className={`nav-links${menuOpen ? ' open' : ''}`}>
+        <div className={`mobile-menu${menuOpen ? ' open' : ''}`}>
           <NavLink to="/" end onClick={() => setMenuOpen(false)}>Inicio</NavLink>
           <NavLink to="/equipos" onClick={() => setMenuOpen(false)}>Equipos</NavLink>
           <NavLink to="/categorias" onClick={() => setMenuOpen(false)}>Categorías</NavLink>
           <NavLink to="/proveedores" onClick={() => setMenuOpen(false)}>Proveedores</NavLink>
           <NavLink to="/empleados" onClick={() => setMenuOpen(false)}>Empleados</NavLink>
-        </div>
-        <div className={`nav-user${menuOpen ? ' open' : ''}`}>
-          <span>{user?.username} ({user?.role})</span>
-          <button onClick={() => { setShowPwModal(true); setMenuOpen(false); }} className="btn-link">Cambiar Contraseña</button>
-          <button onClick={() => { handleLogout(); setMenuOpen(false); }} className="btn-link">Cerrar Sesión</button>
+          <div className="nav-mobile-user">
+            <span>{user?.username} ({user?.role})</span>
+            <button onClick={() => { setShowPwModal(true); setMenuOpen(false); }} className="btn-link">Cambiar Contraseña</button>
+            <button onClick={() => { handleLogout(); setMenuOpen(false); }} className="btn-link">Cerrar Sesión</button>
+          </div>
         </div>
       </nav>
 
