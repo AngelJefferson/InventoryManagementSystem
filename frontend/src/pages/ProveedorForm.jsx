@@ -19,7 +19,7 @@ export default function ProveedorForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      if (isEdit) await updateSupplier(id, form);
+      if (isEdit) await updateSupplier(id, { id, ...form });
       else await createSupplier(form);
       navigate('/proveedores');
     } catch (err) {

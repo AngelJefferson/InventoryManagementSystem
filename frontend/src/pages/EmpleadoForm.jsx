@@ -24,7 +24,7 @@ export default function EmpleadoForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      if (isEdit) await updateEmployee(id, form);
+      if (isEdit) await updateEmployee(id, { id, ...form });
       else await createEmployee(form);
       navigate('/empleados');
     } catch (err) {

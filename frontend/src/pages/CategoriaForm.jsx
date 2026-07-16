@@ -16,7 +16,7 @@ export default function CategoriaForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      if (isEdit) await updateCategory(id, form);
+      if (isEdit) await updateCategory(id, { id, ...form });
       else await createCategory(form);
       navigate('/categorias');
     } catch (err) {
