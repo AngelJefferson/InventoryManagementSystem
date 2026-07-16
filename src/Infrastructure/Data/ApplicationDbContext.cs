@@ -11,7 +11,6 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext
 
     public DbSet<Category> Categories => Set<Category>();
     public DbSet<Product> Products => Set<Product>();
-    public DbSet<Supplier> Suppliers => Set<Supplier>();
     public DbSet<Domain.Entities.Inventory> Inventories => Set<Domain.Entities.Inventory>();
     public DbSet<StockMovement> StockMovements => Set<StockMovement>();
     public DbSet<User> Users => Set<User>();
@@ -39,11 +38,6 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext
             entity.HasIndex(e => e.SKU).IsUnique();
             entity.Property(e => e.Model).HasMaxLength(200);
 
-            entity.HasOne(e => e.Supplier)
-                  .WithMany(e => e.Products)
-                  .HasForeignKey(e => e.SupplierId)
-                  .OnDelete(DeleteBehavior.SetNull);
-
             entity.HasOne(e => e.Employee)
                   .WithMany()
                   .HasForeignKey(e => e.EmployeeId)
@@ -53,15 +47,6 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext
                   .WithOne(e => e.Product)
                   .HasForeignKey<Domain.Entities.Inventory>(e => e.ProductId)
                   .OnDelete(DeleteBehavior.Cascade);
-        });
-
-        modelBuilder.Entity<Supplier>(entity =>
-        {
-            entity.HasKey(e => e.Id);
-            entity.Property(e => e.Name).HasMaxLength(200).IsRequired();
-            entity.Property(e => e.ContactName).HasMaxLength(200).IsRequired();
-            entity.Property(e => e.Email).HasMaxLength(200).IsRequired();
-            entity.Property(e => e.Phone).HasMaxLength(50);
         });
 
         modelBuilder.Entity<Domain.Entities.Inventory>(entity =>

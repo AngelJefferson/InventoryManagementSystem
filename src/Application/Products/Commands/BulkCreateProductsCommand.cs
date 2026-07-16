@@ -66,7 +66,7 @@ public class BulkCreateProductsCommandHandler : IRequestHandler<BulkCreateProduc
 
             var product = new Product(
                 item.Name, "", item.SKU, category.Id,
-                null, item.Model, employeeId,
+                item.Model, employeeId,
                 item.AssetNumber, item.Department, item.PhysicalLocation,
                 item.OperatingSystem, item.HardwareConfiguration,
                 item.Status, item.AcquisitionDate, item.Observations, item.MaintenanceDate

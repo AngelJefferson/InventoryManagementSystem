@@ -9,8 +9,6 @@ public class ProductDto
     public string Model { get; init; } = string.Empty;
     public Guid CategoryId { get; init; }
     public string CategoryName { get; init; } = string.Empty;
-    public Guid? SupplierId { get; init; }
-    public string? SupplierName { get; init; }
     public Guid? EmployeeId { get; init; }
     public string? EmployeeName { get; init; }
     public string? AssetNumber { get; init; }

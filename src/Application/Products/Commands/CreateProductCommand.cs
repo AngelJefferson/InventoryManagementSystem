@@ -13,7 +13,6 @@ public record CreateProductCommand(
     string SKU = "",
     string Model = "",
     Guid CategoryId = default,
-    Guid? SupplierId = null,
     Guid? EmployeeId = null,
     string? AssetNumber = null,
     string Department = "",
@@ -41,16 +40,9 @@ public class CreateProductCommandHandler : IRequestHandler<CreateProductCommand,
         if (!categoryExists)
             throw new KeyNotFoundException($"Category with Id {request.CategoryId} not found.");
 
-        if (request.SupplierId.HasValue)
-        {
-            var supplierExists = await _context.Suppliers.AnyAsync(s => s.Id == request.SupplierId.Value, cancellationToken);
-            if (!supplierExists)
-                throw new KeyNotFoundException($"Supplier with Id {request.SupplierId} not found.");
-        }
-
         var product = new Product(
             request.Name, request.Description, request.SKU, request.CategoryId,
-            request.SupplierId, request.Model, request.EmployeeId,
+            request.Model, request.EmployeeId,
             request.AssetNumber, request.Department, request.PhysicalLocation,
             request.OperatingSystem, request.HardwareConfiguration,
             request.Status, request.AcquisitionDate, request.Observations, request.MaintenanceDate
@@ -67,7 +59,6 @@ public class CreateProductCommandHandler : IRequestHandler<CreateProductCommand,
             SKU = product.SKU,
             Model = product.Model,
             CategoryId = product.CategoryId,
-            SupplierId = product.SupplierId,
             AssetNumber = product.AssetNumber,
             Department = product.Department,
             PhysicalLocation = product.PhysicalLocation,

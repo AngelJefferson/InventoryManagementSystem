@@ -9,8 +9,6 @@ public class Product
     public string Model { get; private set; } = string.Empty;
     public Guid CategoryId { get; private set; }
     public Category Category { get; private set; } = null!;
-    public Guid? SupplierId { get; private set; }
-    public Supplier? Supplier { get; private set; }
     public Guid? EmployeeId { get; private set; }
     public Employee? Employee { get; private set; }
     public string? AssetNumber { get; private set; }
@@ -29,7 +27,7 @@ public class Product
     private Product() { }
 
     public Product(string name, string description, string sku, Guid categoryId,
-        Guid? supplierId = null, string model = "", Guid? employeeId = null,
+        string model = "", Guid? employeeId = null,
         string? assetNumber = null, string department = "", string physicalLocation = "",
         string operatingSystem = "", string hardwareConfiguration = "",
         string status = "", DateTime? acquisitionDate = null,
@@ -41,7 +39,6 @@ public class Product
         SetSKU(sku);
         SetModel(model);
         CategoryId = categoryId;
-        SupplierId = supplierId;
         EmployeeId = employeeId;
         AssetNumber = assetNumber;
         Department = department;
@@ -139,12 +136,6 @@ public class Product
     public void AssignCategory(Guid categoryId)
     {
         CategoryId = categoryId;
-        UpdatedAt = DateTime.UtcNow;
-    }
-
-    public void AssignSupplier(Guid? supplierId)
-    {
-        SupplierId = supplierId;
         UpdatedAt = DateTime.UtcNow;
     }
 

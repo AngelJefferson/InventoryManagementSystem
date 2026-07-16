@@ -13,7 +13,6 @@ public record UpdateProductCommand(
     string SKU = "",
     string Model = "",
     Guid CategoryId = default,
-    Guid? SupplierId = null,
     Guid? EmployeeId = null,
     string? AssetNumber = null,
     string Department = "",
@@ -56,7 +55,6 @@ public class UpdateProductCommandHandler : IRequestHandler<UpdateProductCommand,
         product.SetObservations(request.Observations);
         product.SetMaintenanceDate(request.MaintenanceDate);
         product.AssignCategory(request.CategoryId);
-        product.AssignSupplier(request.SupplierId);
         product.AssignEmployee(request.EmployeeId);
 
         await _context.SaveChangesAsync(cancellationToken);
@@ -70,7 +68,6 @@ public class UpdateProductCommandHandler : IRequestHandler<UpdateProductCommand,
             Model = product.Model,
             CategoryId = product.CategoryId,
             CategoryName = product.Category?.Name ?? string.Empty,
-            SupplierId = product.SupplierId,
             AssetNumber = product.AssetNumber,
             Department = product.Department,
             PhysicalLocation = product.PhysicalLocation,

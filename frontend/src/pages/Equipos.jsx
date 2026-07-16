@@ -73,7 +73,6 @@ export default function Equipos() {
       'Fecha de Adquisición': p.acquisitionDate ? new Date(p.acquisitionDate).toLocaleDateString() : '',
       'Observaciones': p.observations || '',
       'Fecha de Mantenimiento': p.maintenanceDate ? new Date(p.maintenanceDate).toLocaleDateString() : '',
-      'Proveedor': p.supplierName || '',
     }));
     const ws = XLSX.utils.json_to_sheet(data);
     const wb = XLSX.utils.book_new();

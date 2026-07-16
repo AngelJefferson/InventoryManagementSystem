@@ -20,7 +20,6 @@ public class GetAllProductsQueryHandler : IRequestHandler<GetAllProductsQuery, I
     {
         var query = _context.Products
             .Include(p => p.Category)
-            .Include(p => p.Supplier)
             .Include(p => p.Employee)
             .AsQueryable();
 
@@ -46,8 +45,6 @@ public class GetAllProductsQueryHandler : IRequestHandler<GetAllProductsQuery, I
                 Model = p.Model,
                 CategoryId = p.CategoryId,
                 CategoryName = p.Category.Name,
-                SupplierId = p.SupplierId,
-                SupplierName = p.Supplier != null ? p.Supplier.Name : null,
                 EmployeeId = p.EmployeeId,
                 EmployeeName = p.Employee != null ? p.Employee.FullName : null,
                 AssetNumber = p.AssetNumber,
