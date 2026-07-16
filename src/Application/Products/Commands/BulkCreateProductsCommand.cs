@@ -57,7 +57,7 @@ public class BulkCreateProductsCommandHandler : IRequestHandler<BulkCreateProduc
                 var employee = employees.FirstOrDefault(e => e.FullName.Equals(item.EmployeeName, StringComparison.OrdinalIgnoreCase));
                 if (employee == null)
                 {
-                    employee = new Employee(item.EmployeeName, item.Department, item.PhysicalLocation, "", "");
+                    employee = new Employee(item.EmployeeName, item.Department, item.PhysicalLocation, "");
                     _context.Employees.Add(employee);
                     employees.Add(employee);
                 }

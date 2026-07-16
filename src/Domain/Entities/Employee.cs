@@ -7,7 +7,6 @@ public class Employee
     public string Department { get; private set; } = string.Empty;
     public string Sede { get; private set; } = string.Empty;
     public string Position { get; private set; } = string.Empty;
-    public string Email { get; private set; } = string.Empty;
     public bool IsActive { get; private set; }
     public DateTime CreatedAt { get; private set; }
     public DateTime? UpdatedAt { get; private set; }
@@ -15,14 +14,13 @@ public class Employee
 
     private Employee() { }
 
-    public Employee(string fullName, string department, string sede, string position, string email)
+    public Employee(string fullName, string department, string sede, string position)
     {
         Id = Guid.NewGuid();
         SetFullName(fullName);
         SetDepartment(department);
         SetSede(sede);
         SetPosition(position);
-        SetEmail(email);
         IsActive = true;
         CreatedAt = DateTime.UtcNow;
     }
@@ -49,12 +47,6 @@ public class Employee
     public void SetPosition(string position)
     {
         Position = position ?? string.Empty;
-        UpdatedAt = DateTime.UtcNow;
-    }
-
-    public void SetEmail(string email)
-    {
-        Email = email ?? string.Empty;
         UpdatedAt = DateTime.UtcNow;
     }
 

@@ -102,7 +102,6 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext
             entity.Property(e => e.Department).HasMaxLength(100);
             entity.Property(e => e.Sede).HasMaxLength(100);
             entity.Property(e => e.Position).HasMaxLength(100);
-            entity.Property(e => e.Email).HasMaxLength(200);
             entity.HasMany(e => e.Products)
                   .WithOne(p => p.Employee)
                   .HasForeignKey(p => p.EmployeeId)

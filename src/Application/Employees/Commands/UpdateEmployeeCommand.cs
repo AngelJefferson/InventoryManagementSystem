@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace InventoryManagement.Application.Employees.Commands;
 
-public record UpdateEmployeeCommand(Guid Id, string FullName, string Department, string Sede, string Position, string Email = "") : IRequest<EmployeeDto>;
+public record UpdateEmployeeCommand(Guid Id, string FullName, string Department, string Sede, string Position) : IRequest<EmployeeDto>;
 
 public class UpdateEmployeeCommandHandler : IRequestHandler<UpdateEmployeeCommand, EmployeeDto>
 {
@@ -27,7 +27,6 @@ public class UpdateEmployeeCommandHandler : IRequestHandler<UpdateEmployeeComman
         employee.SetDepartment(request.Department);
         employee.SetSede(request.Sede);
         employee.SetPosition(request.Position);
-        employee.SetEmail(request.Email);
 
         await _context.SaveChangesAsync(cancellationToken);
 

@@ -6,7 +6,7 @@ using MediatR;
 
 namespace InventoryManagement.Application.Employees.Commands;
 
-public record CreateEmployeeCommand(string FullName, string Department, string Sede, string Position, string Email = "") : IRequest<EmployeeDto>;
+public record CreateEmployeeCommand(string FullName, string Department, string Sede, string Position) : IRequest<EmployeeDto>;
 
 public class CreateEmployeeCommandHandler : IRequestHandler<CreateEmployeeCommand, EmployeeDto>
 {
@@ -19,7 +19,7 @@ public class CreateEmployeeCommandHandler : IRequestHandler<CreateEmployeeComman
 
     public async Task<EmployeeDto> Handle(CreateEmployeeCommand request, CancellationToken cancellationToken)
     {
-        var employee = new Employee(request.FullName, request.Department, request.Sede, request.Position, request.Email);
+        var employee = new Employee(request.FullName, request.Department, request.Sede, request.Position);
 
         _context.Employees.Add(employee);
         await _context.SaveChangesAsync(cancellationToken);
