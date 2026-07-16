@@ -161,7 +161,7 @@ export default function Equipos() {
         <h1>Equipos</h1>
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
           <button className="btn btn-accent" onClick={exportExcel}>📥 Exportar</button>
-          <button className="btn btn-primary" onClick={() => { setShowImport(true); setImportMsg(''); setImportData(null); }}>📂 Subir Documentos</button>
+          <button className="btn btn-primary" onClick={() => { setShowImport(true); setImportMsg(''); setImportData(null); }}><svg width="16" height="16" viewBox="0 0 16 16" style={{verticalAlign:'middle',marginRight:4}}><rect x="1" y="1" width="14" height="14" rx="2" fill="#217346"/><text x="8" y="12" text-anchor="middle" fill="white" font-size="9" font-weight="bold" font-family="Arial">X</text></svg> Cargar Excel</button>
           <Link to="/equipos/nuevo" className="btn btn-success">+ Nuevo Equipo</Link>
         </div>
       </div>
